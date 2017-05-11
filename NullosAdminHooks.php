@@ -29,17 +29,6 @@ class NullosAdminHooks
     }
 
 
-    protected static function Core_lazyJsInit_addCodeWrapper(\Module\Core\JsLazyCodeCollector\JsLazyCodeCollectorInterface $collector)
-    {
-        $collector->addCodeWrapper('jquery', function ($s) {
-            $r = '$(document).ready(function () {' . PHP_EOL;
-            $r .= $s;
-            $r .= '});' . PHP_EOL;
-            return $r;
-        });
-    }
-
-
     protected static function NullosAdmin_layout_addTopBarRightWidgets(array &$topbarRightWidgets)
     {
 
