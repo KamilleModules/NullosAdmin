@@ -7,6 +7,8 @@ NullosAdmin
 NullosAdmin is an admin website.
 You can use it to administer any website.
 
+WORK IN PROGRESS
+
 
 
 This is a module for the [kamille framework](https://github.com/lingtalfi/Kamille).
