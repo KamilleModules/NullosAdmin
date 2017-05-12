@@ -4,6 +4,8 @@
 namespace Module\NullosAdmin;
 
 
+
+
 class NullosAdminHooks
 {
 
@@ -17,7 +19,13 @@ class NullosAdminHooks
         $autoJsScript = "/theme/" . \Kamille\Architecture\ApplicationParameters\ApplicationParameters::get("theme") . "/controllers/" . \Bat\ClassTool::getShortName($data[0]) . ".js";
         $file = \Kamille\Architecture\ApplicationParameters\ApplicationParameters::get("app_dir") . "/www" . $autoJsScript;
         if (file_exists($file)) {
-            $data[1]['layout']['conf']["jsScripts"][] = $autoJsScript;
+            /**
+             * @var $conf \Kamille\Utils\Laws\Config\LawsConfig
+             */
+            $conf = $data[1];
+            $conf->replace(function (array &$c) use ($autoJsScript) {
+                $c['layout']['conf']["jsScripts"][] = $autoJsScript;
+            });
         }
     }
 
