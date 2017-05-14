@@ -2,6 +2,7 @@
 
 
 use Core\Services\A;
+use Kamille\Ling\Z;
 use Kamille\Services\XConfig;
 
 if (!isset($prc)) {
@@ -79,7 +80,7 @@ $profile = [
                 'confirmText' => "Are you sure you want to execute this action?",
                 'label' => "OVERRIDE",
                 'useSelectedRows' => false,
-                'uri' => XConfig::get("NullosAdmin.uriCrud") . "?type=form&prc=" . $prc,
+                'uri' => Z::link('NullosAdmin_crud') . "?type=form&prc=" . $prc,
                 'type' => "link",
                 'icon' => "fa fa-plus",
             ],
