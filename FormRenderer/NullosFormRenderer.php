@@ -76,8 +76,8 @@ class NullosFormRenderer extends DiyFormRenderer
 
                 $uri = $control['js']['uri'];
                 $jsCode = ' 
-                $("#'. $id .'").autocomplete({
-                    serviceUrl: "'. $uri .'"
+                $("#' . $id . '").autocomplete({
+                    serviceUrl: "' . $uri . '"
                 });
 ';
                 A::addBodyEndJsCode('jquery', $jsCode);
@@ -85,6 +85,7 @@ class NullosFormRenderer extends DiyFormRenderer
                 break;
             case 'dropzone':
 
+                $name = $htmlAttributes['name'];
                 $id = StringTool::getUniqueCssId($identifier);
 
 
@@ -120,10 +121,14 @@ class NullosFormRenderer extends DiyFormRenderer
 
                 $jsCode = '
                 var conf = ' . json_encode($conf) . ';
-                Dropzone.autoDiscover = false;
-                var myDropzone = new Dropzone("div#' . $id . '", conf);
-                //$("div#' . $id . '").dropzone(conf);
-';
+                ';
+                $jsCode .= str_replace([
+                    "{id}",
+                    "{name}",
+                ], [
+                    $id,
+                    $name,
+                ], file_get_contents(__DIR__ . "/assets/dropzoneCall.tpl.js"));
                 A::addBodyEndJsCode('jquery', $jsCode);
 
                 break;
