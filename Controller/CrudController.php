@@ -187,12 +187,29 @@ class CrudController extends NullosAdminController
                 case "delete":
 
                     try {
-
+                        $badge = $prcId . ".delete";
+                        A::has($badge, true);
                         $ric = $_POST['ric'];
-                        $prc = A::getPrc($prcId);
-                        $aRic = PersistentRowCollectionHelper::combineRic($ric, $prc->getRic());
-                        $prc->delete($aRic);
-                        return ModalGscpResponse::make('The item has been deleted', 'success', 'Kool!');
+                        $this->deleteRecordByRic($prcId, $ric);
+                        return ModalGscpResponse::make('The item has been successfully deleted', 'success', 'Kool!');
+
+                    } catch (\Exception $e) {
+                        XLog::error("$e");
+                        return ModalGscpResponse::make('An error occurred, the item might not be deleted, please check the logs', 'error', 'Oops!');
+                    }
+
+                    break;
+                case "deleteAll":
+
+                    try {
+                        $badge = $prcId . ".delete";
+                        A::has($badge, true);
+                        $rics = $_POST['rics'];
+                        foreach ($rics as $ric) {
+                            $this->deleteRecordByRic($prcId, $ric);
+                        }
+                        return ModalGscpResponse::make('The items have been successfully deleted', 'success', 'Kool!');
+
                     } catch (\Exception $e) {
                         XLog::error("$e");
                         return ModalGscpResponse::make('An error occurred, the item might not be deleted, please check the logs', 'error', 'Oops!');
@@ -222,5 +239,12 @@ class CrudController extends NullosAdminController
 
     }
 
+
+    private function deleteRecordByRic($prcId, $ric)
+    {
+        $prc = A::getPrc($prcId);
+        $aRic = PersistentRowCollectionHelper::combineRic($ric, $prc->getRic());
+        $prc->delete($aRic);
+    }
 
 }

@@ -6,6 +6,7 @@ namespace Module\NullosAdmin\ThemeHelper;
 
 use Kamille\Architecture\ApplicationParameters\ApplicationParameters;
 use Kamille\Mvc\HtmlPageHelper\HtmlPageHelper;
+use Kamille\Services\XConfig;
 use Kamille\Services\XLog;
 
 class ThemeHelper implements ThemeHelperInterface
@@ -29,10 +30,20 @@ class ThemeHelper implements ThemeHelperInterface
     }
 
 
+    public function getBackofficeTheme()
+    {
+        if (true === XConfig::get("Core.dualSite")) {
+            return XConfig::get("Core.themeBack");
+        } else {
+            return ApplicationParameters::get("theme");
+        }
+    }
+
+
     public function useLib($libName)
     {
         if (false === array_key_exists($libName, $this->loaded)) {
-            $prefixUri = "/theme/" . ApplicationParameters::get("theme");
+            $prefixUri = "/theme/" . self::getBackofficeTheme();
             $this->loaded[$libName] = true;
             switch ($libName) {
                 //--------------------------------------------

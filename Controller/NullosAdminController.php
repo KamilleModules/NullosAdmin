@@ -8,6 +8,7 @@ use Bat\ClassTool;
 use Core\Controller\ApplicationController;
 use Core\Services\Hooks;
 use Kamille\Architecture\ApplicationParameters\ApplicationParameters;
+use Kamille\Ling\Z;
 use Kamille\Services\XConfig;
 use Kamille\Services\XLog;
 use Kamille\Utils\Laws\Config\LawsConfig;
@@ -144,7 +145,7 @@ class NullosAdminController extends ApplicationController
                         [
                             'text' => "Log out",
                             'icon' => "fa fa-sign-out",
-                            'link' => "/logout",
+                            'link' => Z::link("NullosAdmin_logout"),
                         ],
                     ],
                 ],
