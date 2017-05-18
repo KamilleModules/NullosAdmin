@@ -36,7 +36,6 @@ class NullosDataTableRenderer extends AbstractRenderer
     {
         ob_start();
         $a = $this->model;
-//        a($a);
 
         $columns = $a['headers'];
         $visibleColumns = $a['headers'];
