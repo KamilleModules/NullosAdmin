@@ -1,38 +1,47 @@
 NullosAdmin
 ================
-2017-04-22
+2017-04-22 --> 2018-01-09
 
 
 
-NullosAdmin is an admin website.
-You can use it to administer any website.
-
-WORK IN PROGRESS
+NullosAdmin is a module for the [kamille framework](https://github.com/lingtalfi/Kamille).
 
 
+NullosAdmin aims at providing a general purpose admin.
+Modules can hook into the admin and add their functionality, and coexist with other modules.
 
-This is a module for the [kamille framework](https://github.com/lingtalfi/Kamille).
-
-
-Install
-===========
-using the [kamille installer tool](https://github.com/lingtalfi/kamille-installer-tool)
-```bash
-kamille install NullosAdmin
-```
-
-
-Dependencies
-===============
-- Authenticate
-- DataTable
-- UploadProfile
+For instance, nullos admin could host both an e-commerce module and a blog module (their admin counterparts).
 
 
 
+The NullosAdmin module uses the Claws system (defined in the Kamille framework).
+And so the Claws layout and positions are predefined, and shown on the schema below, representing nullos admin's 
+default layout.
 
-Developers
-===============
 
-Parse the doc directory in this repository to find the topic you
-are interested in.
+
+[![nullos-admin-default-layout.jpg](https://s19.postimg.org/898eyh6ib/nullos-admin-default-layout.jpg)](https://postimg.org/image/hh0nf6dkf/)
+
+
+As we can see, there is a left pane and a right pane.
+
+The left pane contains the sidebar, which will contain the main menu (every module will put their menu items here),
+and the right pane contains the body (position=maincontent), decorated by a header and a footer.
+
+The header part is called topbar and contains two positions: topbar_left and topbar_right.
+
+
+The topbar_right position usually contains the connected user info.
+The footer is just an include (see claws for more nomenclature details): it doesn't contain any position as for now.
+
+
+
+
+
+
+
+
+
+
+
+
