@@ -26,12 +26,15 @@ class NullosUserHelper
             /**
              * Connect the user
              */
-            NullosSession::set("user", [
+            $user = [
                 "login" => $userInfo['id'],
+                "email" => $email,
                 "avatar" => $userInfo['avatar'],
                 "pseudo" => $userInfo['pseudo'],
                 "rights" => $rights,
-            ]);
+            ];
+            Hooks::call("NullosAdmin_User_populateConnectedUser", $user);
+            NullosSession::set("user", $user);
 
 
             /**
