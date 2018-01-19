@@ -26,10 +26,21 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     }
 
 
+    protected function renderInputHidden(array $model, array $preferences = [])
+    {
+        $preferences['inputType'] = "hidden";
+        $this->doRenderInputControl($model, $preferences);
+    }
+
+
     protected function doRenderInputControl(array $model, array $preferences = [])
     {
         $attr = $this->getHtmlAtributesAsString($preferences);
         $cssId = StringTool::getUniqueCssId("f");
+        $inputType = "text";
+        if(array_key_exists("inputType", $preferences)){
+            $inputType = $preferences['inputType'];
+        }
         ?>
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"
@@ -54,7 +65,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     <?php if ($this->isReadOnly($model)): ?>
                         readonly
                     <?php endif; ?>
-                        type="text"
+                        type="<?php echo $inputType; ?>"
 
                         name="<?php echo htmlspecialchars($model['name']); ?>"
                         value="<?php echo htmlspecialchars($model['value']); ?>"
