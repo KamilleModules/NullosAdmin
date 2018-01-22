@@ -21,4 +21,11 @@ class NullosSession extends KamilleSession
         }
         return $default;
     }
+
+    public static function setUserValue($k, $v)
+    {
+        $user = self::get("user", []);
+        $user[$k] = $v;
+        self::set("user", $user);
+    }
 }

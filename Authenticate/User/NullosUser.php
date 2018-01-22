@@ -46,6 +46,11 @@ class NullosUser
         return NullosSession::getUserValue($k, $default);
     }
 
+    public static function set($k, $v)
+    {
+        return NullosSession::setUserValue($k, $v);
+    }
+
 
     public static function disconnect()
     {
