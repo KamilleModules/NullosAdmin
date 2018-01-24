@@ -5,7 +5,9 @@ namespace Module\NullosAdmin\SokoForm\Renderer;
 
 
 use Bat\StringTool;
+use SokoForm\Form\SokoFormInterface;
 use SokoForm\Renderer\SokoFormRenderer;
+use Theme\NullosTheme;
 
 class NullosBootstrapFormRenderer extends SokoFormRenderer
 {
@@ -16,13 +18,89 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     }
 
 
+    public static function displayForm(SokoFormInterface $form, $cssId = null)
+    {
+
+        $r = NullosBootstrapFormRenderer::create()
+            ->setForm($form); // form is a soko form instance
+        $controlNames = array_keys($form->getControls());
+        ?>
+
+
+        <form <?php $r->formAttributes(); ?>
+            <?php if ($cssId): ?>
+                id="<?php echo $cssId; ?>"
+            <?php endif; ?>
+                data-parsley-validate=""
+                class="form-horizontal form-label-left soko-form"
+                novalidate=""
+        >
+            <?php $r->notifications(); ?>
+            <?php
+            $name = $form->getName();
+            foreach ($controlNames as $col): ?>
+                <?php if ($name !== $col): ?>
+                    <?php $r->render($col); ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <?php $r->submitKey(); ?>
+            <?php $r->submitButton(); ?>
+        </form>
+        <?php
+    }
 
     //--------------------------------------------
     // MAIN METHODS
     //--------------------------------------------
+    public function render($controlName, array $preferences = [])
+    {
+        NullosTheme::useLib("form");
+        parent::render($controlName, $preferences);
+    }
+
+
     protected function renderInputText(array $model, array $preferences = [])
     {
         $this->doRenderInputControl($model, $preferences);
+    }
+
+    protected function renderChoiceList(array $model, array $preferences = [])
+    {
+        $type = $model['type'];
+        if ('list' === $type) {
+            ?>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <select name="<?php echo htmlspecialchars($model['name']); ?>" class="form-control">
+                        <?php foreach ($model['choices'] as $value => $label):
+                            $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
+                            ?>
+                            <option
+                                <?php echo $sSel; ?>
+                                    value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <?php
+        } else {
+            $sChecked = (1 === (int)$model['value']) ? "checked" : "";
+            ?>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="">
+                        <label class="switchery-label">
+                            <input name="<?php echo htmlspecialchars($model['name']); ?>" type="checkbox"
+                                   class="js-switch" <?php echo $sChecked; ?>/>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <?php
+        }
     }
 
 
@@ -38,7 +116,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $attr = $this->getHtmlAtributesAsString($preferences);
         $cssId = StringTool::getUniqueCssId("f");
         $inputType = "text";
-        if(array_key_exists("inputType", $preferences)){
+        if (array_key_exists("inputType", $preferences)) {
             $inputType = $preferences['inputType'];
         }
         ?>
