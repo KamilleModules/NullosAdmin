@@ -65,15 +65,29 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $this->doRenderInputControl($model, $preferences);
     }
 
+    protected function renderInputTextarea(array $model, array $preferences = [])
+    {
+        $this->doRenderInputControl($model, $preferences);
+    }
+
     protected function renderChoiceList(array $model, array $preferences = [])
     {
         $type = $model['type'];
         if ('list' === $type) {
+
+            $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
+            $readOnly = array_key_exists("readonly", $properties);
+            $sDisabled = "";
+            if (true === $readOnly) {
+                $sDisabled = ' disabled="true"';
+            }
+
             ?>
             <div class="form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
-                    <select name="<?php echo htmlspecialchars($model['name']); ?>" class="form-control">
+                    <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
+                                                      class="form-control">
                         <?php foreach ($model['choices'] as $value => $label):
                             $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
                             ?>
@@ -82,25 +96,38 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                     value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
                         <?php endforeach; ?>
                     </select>
+
+                    <?php if (true === $readOnly): ?>
+                        <input type="hidden" name="<?php echo htmlspecialchars($model['name']); ?>"
+                               value="<?php echo htmlspecialchars($model['value']); ?>"
+                        >
+                    <?php endif; ?>
+
                 </div>
             </div>
             <?php
         } else {
-            $sChecked = (1 === (int)$model['value']) ? "checked" : "";
-            ?>
-            <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="">
-                        <label class="switchery-label">
-                            <input name="<?php echo htmlspecialchars($model['name']); ?>" type="checkbox"
-                                   class="js-switch" <?php echo $sChecked; ?>/>
-                        </label>
-                    </div>
+            throw new \Exception("not handled yet with type=$type");
+        }
+    }
+
+    protected function renderChoiceBooleanList(array $model, array $preferences = [])
+    {
+        $sChecked = (1 === (int)$model['value']) ? "checked" : "";
+        ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="">
+                    <label class="switchery-label">
+                        <input name="<?php echo htmlspecialchars($model['name']); ?>" type="checkbox"
+                               class="js-switch" <?php echo $sChecked; ?>/>
+                    </label>
                 </div>
             </div>
-            <?php
-        }
+        </div>
+        <?php
+
     }
 
 
@@ -115,6 +142,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     {
         $attr = $this->getHtmlAtributesAsString($preferences);
         $cssId = StringTool::getUniqueCssId("f");
+        $type = $model['type'];
+
         $inputType = "text";
         if (array_key_exists("inputType", $preferences)) {
             $inputType = $preferences['inputType'];
@@ -133,23 +162,13 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 <?php echo " soko-active"; ?>
     <?php endif; ?>
 ">
-                <input
-                    <?php if ($this->isRequired($model)): ?>
-                        required="required"
-                    <?php endif; ?>
-                    <?php if ($this->isDisabled($model)): ?>
-                        disabled
-                    <?php endif; ?>
-                    <?php if ($this->isReadOnly($model)): ?>
-                        readonly
-                    <?php endif; ?>
-                        type="<?php echo $inputType; ?>"
 
-                        name="<?php echo htmlspecialchars($model['name']); ?>"
-                        value="<?php echo htmlspecialchars($model['value']); ?>"
-                        id="<?php echo $cssId; ?>"
-                        class="form-control col-md-7 col-xs-12"
-                >
+                <?php if ("textarea" === $type): ?>
+                    <?php $this->displayTextareaWidget($model, $inputType, $cssId); ?>
+                <?php else: ?>
+                    <?php $this->displayInputWidget($model, $inputType, $cssId); ?>
+                <?php endif; ?>
+
                 <?php $this->doRenderError($model, $preferences); ?>
             </div>
         </div>
@@ -233,6 +252,52 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         }
         return false;
     }
+
+    protected function displayInputWidget($model, $inputType, $cssId)
+    {
+        ?>
+        <input
+            <?php if ($this->isRequired($model)): ?>
+                required="required"
+            <?php endif; ?>
+            <?php if ($this->isDisabled($model)): ?>
+                disabled
+            <?php endif; ?>
+            <?php if ($this->isReadOnly($model)): ?>
+                readonly
+            <?php endif; ?>
+                type="<?php echo $inputType; ?>"
+
+                name="<?php echo htmlspecialchars($model['name']); ?>"
+                value="<?php echo htmlspecialchars($model['value']); ?>"
+                id="<?php echo $cssId; ?>"
+                class="form-control col-md-7 col-xs-12"
+        >
+        <?php
+    }
+
+
+    protected function displayTextareaWidget($model, $inputType, $cssId)
+    {
+        ?>
+        <textarea
+            <?php if ($this->isRequired($model)): ?>
+                required="required"
+            <?php endif; ?>
+            <?php if ($this->isDisabled($model)): ?>
+                disabled
+            <?php endif; ?>
+            <?php if ($this->isReadOnly($model)): ?>
+                readonly
+            <?php endif; ?>
+                type="<?php echo $inputType; ?>"
+                name="<?php echo htmlspecialchars($model['name']); ?>"
+                id="<?php echo $cssId; ?>"
+                class="form-control col-md-7 col-xs-12"
+        ><?php echo $model['value']; ?></textarea>
+        <?php
+    }
+
 }
 
 
