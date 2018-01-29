@@ -70,6 +70,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $this->doRenderInputControl($model, $preferences);
     }
 
+    protected function renderAutocompleteInputText(array $model, array $preferences = [])
+    {
+        $this->doRenderInputControl($model, $preferences);
+    }
+
     protected function renderChoiceList(array $model, array $preferences = [])
     {
         $type = $model['type'];
@@ -144,6 +149,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $cssId = StringTool::getUniqueCssId("f");
         $type = $model['type'];
 
+
         $inputType = "text";
         if (array_key_exists("inputType", $preferences)) {
             $inputType = $preferences['inputType'];
@@ -163,10 +169,50 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     <?php endif; ?>
 ">
 
+
                 <?php if ("textarea" === $type): ?>
                     <?php $this->displayTextareaWidget($model, $inputType, $cssId); ?>
                 <?php else: ?>
-                    <?php $this->displayInputWidget($model, $inputType, $cssId); ?>
+                    <?php if (array_key_exists("autocomplete", $model)):
+                        /**
+                         * In this case, we display 2 inputs:
+                         * - one for the visual cue for the user
+                         * - the real input used to hold the real value that we want
+                         */
+                        NullosTheme::useLib("jqueryUi");
+                        ?>
+
+
+                        <?php $this->displayInputWidget($model, "hidden", $cssId); // hidden ?>
+
+                        <?php
+                        $model['name'] .= "-autocomplete";
+                        $cssId2 = StringTool::getUniqueCssId("f2");
+                        $this->displayInputWidget($model, "text", $cssId2); // visual control for holding label
+
+                        $autocompleteOptions = $model['autocompleteOptions'];
+                        ?>
+                        <script>
+                            var autoCompleteOptions = <?php echo json_encode($autocompleteOptions, \JSON_FORCE_OBJECT); ?>;
+
+
+                            autoCompleteOptions.select = function (event, ui) {
+                                var jInput = $("#<?php echo $cssId; ?>");
+                                jInput.val(ui.item.id);
+                                var jInput2 = $("#<?php echo $cssId2; ?>");
+                                jInput2.val(ui.item.label);
+                                return false;
+                            };
+
+                            jqueryComponent.ready(function () {
+                                $("#<?php echo $cssId2; ?>").autocomplete(autoCompleteOptions);
+                            });
+                        </script>
+
+
+                    <?php else: ?>
+                        <?php $this->displayInputWidget($model, $inputType, $cssId); ?>
+                    <?php endif; ?>
                 <?php endif; ?>
 
                 <?php $this->doRenderError($model, $preferences); ?>
