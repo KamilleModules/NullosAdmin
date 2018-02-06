@@ -53,6 +53,31 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     //--------------------------------------------
     // MAIN METHODS
     //--------------------------------------------
+    protected function getRenderIdentifier(array $controlModel)
+    {
+
+        /**
+         * This is the default algorithm that maps a control to
+         * a renderer method name.
+         * Feel free to override this method as you wish.
+         */
+
+        $ret = null;
+        $className = $controlModel['class'];
+        switch ($className) {
+            case "EkomSokoDateControl":
+                $type = $controlModel['type'];
+                $ret = "input-$type";
+                break;
+        }
+        if ($ret) {
+            return $ret;
+        }
+        return parent::getRenderIdentifier($controlModel);
+
+    }
+
+
     public function render($controlName, array $preferences = [])
     {
         NullosTheme::useLib("form");
@@ -155,6 +180,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             $inputType = $preferences['inputType'];
         }
         ?>
+
+
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"
                    for="<?php echo $cssId; ?>"><?php $this->doRenderLabel($model, $preferences); ?>
@@ -180,22 +207,33 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                          * - the real input used to hold the real value that we want
                          */
                         NullosTheme::useLib("jqueryUi");
-                        ?>
 
-
-                        <?php $this->displayInputWidget($model, "hidden", $cssId); // hidden ?>
-
-                        <?php
-                        $model['name'] .= "-autocomplete";
+                        $model2 = $model;
+                        $model2['name'] .= "-autocomplete";
                         $cssId2 = StringTool::getUniqueCssId("f2");
-                        $this->displayInputWidget($model, "text", $cssId2); // visual control for holding label
 
-                        $autocompleteOptions = $model['autocompleteOptions'];
+
+                        $autocompleteOptions = $model2['autocompleteOptions'];
                         ?>
+                        <div class="form-group">
+                            <?php
+                            $model2['value'] = "";
+                            $extra = 'placeholder="Search..."';
+                            if ($this->isReadOnly($model)) {
+                                $extra = '';
+                            }
+                            $this->displayInputWidget($model2, "text", $cssId2, "form-control has-feedback-left", $extra); // visual control for holding label;
+                            ?>
+                            <?php
+
+                            $this->displayInputWidget($model, "text", $cssId, "form-control-feedback left", 'style="border-left: none;border-top: none;border-bottom: none;top: -2px;"'); // hidden
+                            ?>
+                            <!--                            <span class="fa fa-cloud-download form-control-feedback left" aria-hidden="true"></span>-->
+                        </div>
+
+
                         <script>
                             var autoCompleteOptions = <?php echo json_encode($autocompleteOptions, \JSON_FORCE_OBJECT); ?>;
-
-
                             autoCompleteOptions.select = function (event, ui) {
                                 var jInput = $("#<?php echo $cssId; ?>");
                                 jInput.val(ui.item.id);
@@ -210,8 +248,34 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         </script>
 
 
+                    <?php else:
+                    $properties = $model['properties'];
+                    $lang = (array_key_exists("lang", $properties)) ? $properties["lang"] : "en";
+                    ?>
+                    <?php if (array_key_exists("date", $properties) && true === $properties['date']): ?>
+
+                    <input type="text" class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
+                        <?php if (null !== $model['label']): ?>
+                            placeholder="<?php echo htmlspecialchars($model['label']); ?>"
+                        <?php endif; ?>
+                    >
+                        <span class="fa fa-calendar-o form-control-feedback left"></span>
+                        <script>
+                            jqueryComponent.ready(function () {
+
+                                moment.locale('<?php echo $lang; ?>'); // see init in custom.js
+                                $('#<?php echo $cssId; ?>').daterangepicker({
+                                    singleDatePicker: true,
+                                    locale: {
+                                        format: 'YYYY-MM-DD'
+                                    },
+                                    singleClasses: "picker_1"
+                                });
+                            });
+                        </script>
                     <?php else: ?>
                         <?php $this->displayInputWidget($model, $inputType, $cssId); ?>
+                    <?php endif; ?>
                     <?php endif; ?>
                 <?php endif; ?>
 
@@ -299,7 +363,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         return false;
     }
 
-    protected function displayInputWidget($model, $inputType, $cssId)
+    protected function displayInputWidget($model, $inputType, $cssId, $cssClass = null, $extra = null)
     {
         ?>
         <input
@@ -317,7 +381,14 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 name="<?php echo htmlspecialchars($model['name']); ?>"
                 value="<?php echo htmlspecialchars($model['value']); ?>"
                 id="<?php echo $cssId; ?>"
+            <?php if ($cssClass): ?>
+                class="<?php echo $cssClass; ?>"
+            <?php else: ?>
                 class="form-control col-md-7 col-xs-12"
+            <?php endif; ?>
+            <?php if ($extra): ?>
+                <?php echo $extra; ?>
+            <?php endif; ?>
         >
         <?php
     }
