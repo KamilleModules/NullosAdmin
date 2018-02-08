@@ -65,9 +65,17 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $ret = null;
         $className = $controlModel['class'];
         switch ($className) {
+            /**
+             * @todo-ling: this is a logic error,
+             * Ekom should not appear at the Nullos module level
+             */
             case "EkomSokoDateControl":
                 $type = $controlModel['type'];
                 $ret = "input-$type";
+                break;
+            case "NullosSokoReactiveChoiceControl":
+                $type = $controlModel['type'];
+                $ret = "choice-$type";
                 break;
         }
         if ($ret) {
@@ -105,37 +113,108 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $type = $model['type'];
         if ('list' === $type) {
 
+            $cssId = StringTool::getUniqueCssId("select-");
             $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
-            $readOnly = array_key_exists("readonly", $properties);
+            $readOnly = (array_key_exists("readonly", $properties) && (true === $properties['readonly']));
             $sDisabled = "";
             if (true === $readOnly) {
                 $sDisabled = ' disabled="true"';
             }
 
+            $sErrorClass = "";
+            if ($model['errors']) {
+                $sErrorClass = "soko-error-container soko-active";
+            }
+
             ?>
-            <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
-                                                      class="form-control">
-                        <?php foreach ($model['choices'] as $value => $label):
-                            $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
-                            ?>
-                            <option
-                                <?php echo $sSel; ?>
-                                    value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
-                        <?php endforeach; ?>
-                    </select>
+            <?php if (array_key_exists("listenTo", $properties)): ?>
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
+                        <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
+                                                          id="<?php echo $cssId; ?>"
+                                                          class="form-control has-feedback-left">
+                            <?php foreach ($model['choices'] as $value => $label):
+                                $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
+                                ?>
+                                <option
+                                    <?php echo $sSel; ?>
+                                        value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <?php if (true === $readOnly): ?>
-                        <input type="hidden" name="<?php echo htmlspecialchars($model['name']); ?>"
-                               value="<?php echo htmlspecialchars($model['value']); ?>"
-                        >
-                    <?php endif; ?>
 
+                        <span class="fa fa-spinner form-control-feedback left" aria-hidden="true"></span>
+                        <?php $this->doRenderError($model, $preferences); ?>
+                    </div>
                 </div>
-            </div>
+                <?php
+
+                //--------------------------------------------
+                // HANDLING REACTIVE BEHAVIOUR
+                // - NullosSokoReactiveChoiceControl
+                //--------------------------------------------
+                if (array_key_exists("listenTo", $properties)) {
+                    $listenTo = $properties['listenTo'];
+                    $service = $properties['service'];
+                    ?>
+                    <script>
+                        jqueryComponent.ready(function () {
+                            var jComponent = $("#<?php echo $cssId; ?>");
+                            var jForm = jComponent.closest('form');
+                            var jTarget = jForm.find('select[name="<?php echo $listenTo; ?>"]');
+                            var api = ekomApi.inst();
+                            jTarget
+                                .off('change.nullosReactive')
+                                .on('change.nullosReactive', function () {
+                                    var value = $(this).val();
+                                    api.utils.request("<?php echo $service; ?>", {
+                                        feature_id: value
+                                    }, function (r) {
+                                        jComponent.empty();
+                                        for (var k in r) {
+                                            var v = r[k];
+                                            jComponent.append('<option value="' + k + '">' + v + '</option>');
+                                        }
+
+                                    });
+                                });
+                        });
+                    </script>
+
+
+                    <?php
+                }
+                ?>
+            <?php else: ?>
+
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+                    <div class="col-md-6 col-sm-6 col-xs-12 <?php echo $sErrorClass; ?>">
+                        <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
+                                                          id="<?php echo $cssId; ?>"
+                                                          class="form-control">
+                            <?php foreach ($model['choices'] as $value => $label):
+                                $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
+                                ?>
+                                <option
+                                    <?php echo $sSel; ?>
+                                        value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <?php if (true === $readOnly): ?>
+                            <input type="hidden" name="<?php echo htmlspecialchars($model['name']); ?>"
+                                   value="<?php echo htmlspecialchars($model['value']); ?>"
+                            >
+                        <?php endif; ?>
+                        <?php $this->doRenderError($model, $preferences); ?>
+                    </div>
+                </div>
+
+            <?php endif; ?>
             <?php
+
         } else {
             throw new \Exception("not handled yet with type=$type");
         }
