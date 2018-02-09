@@ -5,6 +5,7 @@ namespace Module\NullosAdmin\SokoForm\Renderer;
 
 
 use Bat\StringTool;
+use Core\Services\Hooks;
 use SokoForm\Form\SokoFormInterface;
 use SokoForm\Renderer\SokoFormRenderer;
 use Theme\NullosTheme;
@@ -21,6 +22,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     public static function displayForm(SokoFormInterface $form, $cssId = null)
     {
 
+        if (null === $cssId) {
+            $cssId = StringTool::getUniqueCssId("form-");
+        }
         $r = NullosBootstrapFormRenderer::create()
             ->setForm($form); // form is a soko form instance
         $controlNames = array_keys($form->getControls());
@@ -154,38 +158,40 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 // HANDLING REACTIVE BEHAVIOUR
                 // - NullosSokoReactiveChoiceControl
                 //--------------------------------------------
-                if (array_key_exists("listenTo", $properties)) {
-                    $listenTo = $properties['listenTo'];
-                    $service = $properties['service'];
-                    ?>
-                    <script>
-                        jqueryComponent.ready(function () {
-                            var jComponent = $("#<?php echo $cssId; ?>");
-                            var jForm = jComponent.closest('form');
-                            var jTarget = jForm.find('select[name="<?php echo $listenTo; ?>"]');
-                            var api = ekomApi.inst();
-                            jTarget
-                                .off('change.nullosReactive')
-                                .on('change.nullosReactive', function () {
-                                    var value = $(this).val();
-                                    api.utils.request("<?php echo $service; ?>", {
-                                        feature_id: value
-                                    }, function (r) {
-                                        jComponent.empty();
-                                        for (var k in r) {
-                                            var v = r[k];
-                                            jComponent.append('<option value="' + k + '">' + v + '</option>');
-                                        }
-
-                                    });
-                                });
-                        });
-                    </script>
-
-
-                    <?php
-                }
+                $listenTo = $properties['listenTo'];
+                $service = $properties['service'];
                 ?>
+                <script>
+                    jqueryComponent.ready(function () {
+                        var jComponent = $("#<?php echo $cssId; ?>");
+                        var jForm = jComponent.closest('form');
+                        var jTarget = jForm.find('select[name="<?php echo $listenTo; ?>"]');
+                        var api = ekomApi.inst();
+                        jTarget
+                            .off('change.nullosReactive')
+                            .on('change.nullosReactive', function () {
+                                var value = $(this).val();
+                                api.utils.request("<?php echo $service; ?>", {
+                                    feature_id: value
+                                }, function (r) {
+                                    /**
+                                     * make the potential error message disappear (if using soko),
+                                     * see soko doc and soko-form-error-removal-tool.js for more info
+                                     *
+                                     */
+                                    jComponent.parent().removeClass('soko-active');
+                                    jComponent.empty();
+                                    for (var k in r) {
+                                        var v = r[k];
+                                        jComponent.append('<option value="' + k + '">' + v + '</option>');
+                                    }
+
+                                });
+                            });
+                    });
+                </script>
+
+
             <?php else: ?>
 
                 <div class="form-group">
@@ -293,10 +299,18 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
                         $autocompleteOptions = $model2['autocompleteOptions'];
+                        $action = $autocompleteOptions['action'];
+
+
                         ?>
-                        <div class="form-group">
+                        <div class="form-group auto-complete-container">
                             <?php
-                            $model2['value'] = "";
+
+                            $value2 = "";
+                            Hooks::call("NullosAdmin_SokoForm_NullosBootstrapRenderer_AutocompleteInitialValue", $value2, $action, $model['value']);
+                            $model2['value'] = $value2;
+
+
                             $extra = 'placeholder="Search..."';
                             if ($this->isReadOnly($model)) {
                                 $extra = '';
@@ -312,16 +326,28 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
                         <script>
-                            var autoCompleteOptions = <?php echo json_encode($autocompleteOptions, \JSON_FORCE_OBJECT); ?>;
-                            autoCompleteOptions.select = function (event, ui) {
-                                var jInput = $("#<?php echo $cssId; ?>");
-                                jInput.val(ui.item.id);
-                                var jInput2 = $("#<?php echo $cssId2; ?>");
-                                jInput2.val(ui.item.label);
-                                return false;
-                            };
-
                             jqueryComponent.ready(function () {
+
+                                /**
+                                 * This is basic jqueryUi autocomplete
+                                 * http://jqueryui.com/autocomplete/
+                                 **/
+                                var autoCompleteOptions = <?php echo json_encode($autocompleteOptions, \JSON_FORCE_OBJECT); ?>;
+                                autoCompleteOptions.select = function (event, ui) {
+                                    var jInput = $("#<?php echo $cssId; ?>");
+                                    jInput.val(ui.item.id);
+                                    var jInput2 = $("#<?php echo $cssId2; ?>");
+                                    jInput2.val(ui.item.label);
+                                    /**
+                                     * make the potential error message disappear (if using soko),
+                                     * see soko doc and soko-form-error-removal-tool.js for more info
+                                     *
+                                     */
+                                    jInput.closest(".soko-error-container").removeClass('soko-active');
+                                    return false;
+                                };
+
+
                                 $("#<?php echo $cssId2; ?>").autocomplete(autoCompleteOptions);
                             });
                         </script>
