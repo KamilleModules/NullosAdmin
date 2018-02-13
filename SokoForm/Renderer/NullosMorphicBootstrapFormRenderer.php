@@ -18,7 +18,6 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
 
         $form = $conf['form'];
         parent::displayForm($form, $cssId);
-
         if (array_key_exists("formAfterElements", $conf)) {
             $els = $conf['formAfterElements'];
             foreach ($els as $el) {
@@ -26,6 +25,32 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
             }
         }
 
+
+        /**
+         * Assuming we are on a form/list pattern,
+         * when the user deletes the row we reload the page
+         * and display just the list (i.e. we do not display the form because it's confusing for the user).
+         *
+         */
+        $context = $conf['context'];
+        $uri = $_SERVER['REQUEST_URI'];
+        if (false !== ($pos = strpos($uri, '?'))) {
+            $uri = substr($uri, 0, $pos);
+        }
+        if ($context) {
+            unset($context['avatar']);
+            $uri .= "?" . http_build_query($context);
+        }
+
+        ?>
+        <script>
+            jqueryComponent.ready(function () {
+                window.Morphic.onDeleteAfter = function () {
+                    window.location.href = "<?php echo $uri; ?>";
+                };
+            });
+        </script>
+        <?php
     }
 
 

@@ -1,23 +1,21 @@
 <?php
 
 
-namespace Module\Ekom\Morphic\Generator\ConfigFile;
+namespace Module\NullosAdmin\Morphic\Generator\ConfigFile;
 
 
+use Bat\CaseTool;
 use Kamille\Utils\Morphic\Exception\MorphicException;
 use Kamille\Utils\Morphic\Generator\ConfigFileGenerator\ConfigFileGeneratorInterface;
-use Kamille\Utils\Morphic\Generator\GeneratorHelper\MorphicGeneratorHelper;
+use PhpFile\PhpFile;
+use QuickPdo\QuickPdoInfoTool;
 
 class NullosFormConfigFileGenerator implements ConfigFileGeneratorInterface
 {
 
-    protected $beginStatements;
-    protected $formControls;
-
     public function __construct()
     {
-        $this->beginStatements = [];
-        $this->formControls = [];
+        //
     }
 
 
@@ -31,194 +29,241 @@ class NullosFormConfigFileGenerator implements ConfigFileGeneratorInterface
     //--------------------------------------------
     public function getConfigFileContent(array $operation, array $config = [])
     {
-        $file = __DIR__ . "/../assets/simple.form.conf.php";
-        $camelCase = $operation['CamelCase'];
+
+        $elementType = $operation['elementType'];
+        $file = PhpFile::create();
+
+        switch ($elementType) {
+            case "simple":
+                break;
+            default:
+                throw new MorphicException("Type not handled yet: $elementType");
+                break;
+        }
+
+        $ric = $operation['ric'];
+        $vRic = $this->getVerticalRic($ric);
+        $vRicKeys = $this->getVerticalRic($ric, true);
+        $commaRics = '$' . implode(', $', $ric);
         $name = $operation['elementName'];
+        $table = $operation['elementTable'];
+        $label = $operation['elementLabel'];
+        $ucLabel = ucfirst($operation['elementLabel']);
+        $onProcessBefore = $this->getOnProcessBefore($operation, $config);
+        $elementObject = $this->getObjectByElementName($operation['elementName']);
+        $file->addUseStatement('use Module\Ekom\Api\Object\Seller\\' . $elementObject . ";");
 
 
-        $this->beginStatements = [];
-        $this->formControls = [];
+        if (false === array_key_exists("formInsertSuccessMsg", $operation)) {
+            $operation['formInsertSuccessMsg'] = "Le/la " . $label . " a bien été ajouté(e)";
+        }
+        if (false === array_key_exists("formUpdateSuccessMsg", $operation)) {
+            $operation['formUpdateSuccessMsg'] = "Le/la " . $label . " a bien été mis(e) à jour";
+        }
+        $formInsertSuccessMsg = htmlspecialchars($operation['formInsertSuccessMsg']);
+        $formUpdateSuccessMsg = htmlspecialchars($operation['formUpdateSuccessMsg']);
 
-        $columns = $operation['columns'];
 
-        $this->prepareBeginStatements($operation, $config);
-
-        foreach ($columns as $col) {
-            $this->scanControl($col, $operation, $config);
+        //--------------------------------------------
+        // RIC PART
+        //--------------------------------------------
+        foreach ($ric as $col) {
+            $file->addBodyStatement(<<<EEE
+\$$col = (array_key_exists('$col', \$_GET)) ? (int)\$_GET['$col'] : null;
+EEE
+            );
         }
 
 
-//        $formControls = $this->getFormControls($operation, $config);
+        //--------------------------------------------
+        // UPDATE INSERT
+        //--------------------------------------------
+        $file->addBodyStatement(<<<'EEE'
+        
+//--------------------------------------------
+// UPDATE|INSERT MODE
+//--------------------------------------------
+$isUpdate = (false === array_key_exists("form", $_GET));
+EEE
+        );
 
-
-        $beginStatements = implode(PHP_EOL, $this->beginStatements);
-        $formControls = implode(PHP_EOL, $this->formControls);
-
-
-        $content = str_replace([
-            'ProductGroup',
-            'product_group',
-            '// beginStatements',
-            '// formControls',
-        ], [
-            $camelCase,
-            $name,
-            $beginStatements,
-            $formControls,
-        ], file_get_contents($file));
-        return $content;
-    }
-
-
+        //--------------------------------------------
+        // FORM START
+        //--------------------------------------------
+        $file->addBodyStatement(<<<EEE
+        
+//--------------------------------------------
+// FORM
+//--------------------------------------------
+\$conf = [
     //--------------------------------------------
-    //
+    // FORM WIDGET
     //--------------------------------------------
-    protected function prepareBeginStatements(array $operation, array $config = [])
-    {
-        /**
-         *
-         * Note to myself:
-         * The main strategy to decide whether a form is in insert mode or update mode is the following:
-         *
-         * - if the ric keys are found in the uri, it's an update, otherwise it's an insert.
-         * Note that some of the ric keys might be found in the context, and those keys
-         * might be redundant with the ones find in the uri.
-         *
-         */
-        $s = '';
-        $ric = $operation['ric'];
-        foreach ($ric as $ricCol) {
-            $s .= $this->line('$' . $ricCol . ' = (array_key_exists(\'' . $ricCol . '\', $_GET)) ? (int)$_GET[\'' . $ricCol . '\'] : null;');
+    'title' => "$ucLabel",
+    //--------------------------------------------
+    // SOKO FORM
+    'form' => SokoForm::create()
+        ->setName("soko-form-$name")
+EEE
+        );
+
+        //--------------------------------------------
+        // FORM END
+        //--------------------------------------------
+        $file->addBodyStatement(<<<EEE
+    'feed' => MorphicHelper::getFeedFunction("$table"),
+    'process' => function (\$fData, SokoFormInterface \$form) use (\$isUpdate, $commaRics) {
+
+        $onProcessBefore
+
+
+        if (false === \$isUpdate) {
+            $elementObject::getInst()->create(\$fData);
+            \$form->addNotification("$formInsertSuccessMsg", "success");
+        } else {
+            $elementObject::getInst()->update(\$fData, [
+                $vRicKeys
+            ]);
+            \$form->addNotification("$formUpdateSuccessMsg", "success");
         }
-        $this->beginStatements[] = $s;
-    }
-
-
-    protected function scanControl($column, array $operation, array $config = [])
-    {
-        $columnLabel = MorphicGeneratorHelper::getColumnLabel($column, $operation, $config);
-        if(in_array($column, $operation['ric'])){
-            $this->formControls[] = [
-                "class" => 'SokoInputControl',
-                "name" => $column,
-                "label" => $columnLabel,
-                "properties" => [
-                    'readonly' => true,
+        return false;
+    },
+    //--------------------------------------------
+    // to fetch values
+    'ric' => [
+        $vRic
+    ],
+    //--------------------------------------------
+    // IF HAS CONTEXT
+    //--------------------------------------------
+    'formAfterElements' => [
+        [
+            "type" => "pivotLinks",
+            "links" => [
+                [
+                    /**
+                     * Foreach ric,
+                     * notice that we use the foreign key (seller_id) of the foreign table rather
+                     * than the ric of the current table (id)
+                     */
+                    "link" => E::link("NullosAdmin_Ekom_TestHas_List") . "?seller_id=$id",
+                    "text" => "Voir les addresses de ce vendeur",
                 ],
-                "valuePhp" => 0,
-            ];
-        }
-        else{
+            ],
+        ],
+    ],
+];
+EEE
+        );
+
+
+        //--------------------------------------------
+        // DISCOVERING PIVOT LINKS
+        //--------------------------------------------
+        $tableInfos = $this->getPivotTablesInfo($operation, $config);
+        az($tableInfos);
+        foreach($tableInfos as $table => $info){
 
         }
+
+
+        return $file->render();
     }
 
 
-    protected function getFormControls(array $operation, array $config = [])
+    protected function getOnProcessBefore(array $operation, array $config)
+    {
+        return [];
+    }
+
+    protected function getObjectByElementName($name)
+    {
+        return CaseTool::snakeToFlexiblePascal($name);
+    }
+
+    protected function getVerticalRic(array $ric, $addKeys = false)
     {
         $s = '';
-        $cols = $operation['columns'];
-        $ric = $operation['ric'];
-
-        foreach ($cols as $col) {
-
-            $columnLabel = MorphicGeneratorHelper::getColumnLabel($col, $operation, $config);
-            //--------------------------------------------
-            // GET THE RIC OUT OF THE WAY
-            //--------------------------------------------
-            if (true === in_array($col, $ric, true)) {
-                $columnLabel = MorphicGeneratorHelper::getColumnLabel($col, $operation, $config);
-
-                $s .= $this->line('
-->addControl(SokoInputControl::create()
-->setName("' . $col . '")
-->setLabel(\'' . $columnLabel . '\')
-->setProperties([
-    \'readonly\' => true,
-])
-->setValue($id)
-)
-');
-            }
-            //--------------------------------------------
-            // OTHER COLUMNS
-            //--------------------------------------------
-            else {
-                $controlInfo = $this->getControlInfo($col, $operation);
-
-
-                /**
-                 * $addressControl = SokoAutocompleteInputControl::create()
-                 * ->setAutocompleteOptions(BackFormHelper::createSokoAutocompleteOptions([
-                 * 'action' => "auto.address",
-                 * ]))
-                 * ->setName("address_id")
-                 * ->setLabel('Address id')
-                 * ->setValue($addressId);
-                 *
-                 *
-                 * if ($isUpdate) {
-                 * $addressControl->setProperties([
-                 * 'readonly' => true,
-                 * ]);
-                 * }
-                 */
-
-
-                $t = '
-->addControl(' . $controlInfo['class'] . '::create()
-    ->setName("' . $col . '")
-    ->setLabel(\'' . $columnLabel . '\')
-';
-                $t .= '
-)';
-                $s .= $this->line($t);
+        foreach ($ric as $col) {
+            if (false === $addKeys) {
+                $s .= "'" . $col . "'," . PHP_EOL;
+            } else {
+                $s .= "'" . $col . "' => \$$col," . PHP_EOL;
             }
         }
         return $s;
+
     }
 
-
-    protected function getControlInfo($column, array $operation)
+    private function getPivotTablesInfo($operation, array $config)
     {
         $ret = [];
-        $columnTypes = $operation['columnTypes'];
-        $fkeys = $operation['columnFkeys'];
-        $sqlType = $columnTypes[$column];
-        if (array_key_exists($column, $fkeys)) {
-            $ret['class'] = "SokoChoiceControl";
-        } else {
 
-            switch ($sqlType) {
-                case "int":
-                case "tinyint":
-                case "varchar":
-                    $ret['class'] = "SokoInputControl";
-                    break;
-                case "text":
-                    $ret['class'] = "SokoInputControl";
-                    $ret['type'] = "textarea";
-                    break;
-                default:
-                    break;
+        //--------------------------------------------
+        // GET TABLES
+        //--------------------------------------------
+        $tables = [];
+        $pivotMode = (array_key_exists("pivotMode", $config)) ? $config['pivotMode'] : 'discover';
+        $pivot = [];
+        if (array_key_exists("pivot", $operation)) {
+            $pivot = $operation['pivot'];
+            if (array_key_exists("mode", $pivot)) {
+                $pivotMode = $pivot['mode'];
             }
         }
 
+        // manual tables
+        $tablesInfo = [];
+        if (array_key_exists("tables", $pivot)) {
+            $tablesInfo = $pivot['tables'];
+            $tables = array_keys($tablesInfo);
+        }
+        // do we need to discover tables?
+        if ("discover" === $pivotMode) {
+            $prefix = $operation['elementTable'] . "_has_";
+            $dbName = QuickPdoInfoTool::getDatabase();
+            $dbTables = QuickPdoInfoTool::getTables($dbName);
+            foreach ($dbTables as $table) {
+                if (
+                    (0 === strpos($table, $prefix)) &&
+                    false === in_array($table, $tables)
+                ) {
+                    $tables[] = $table;
+                }
+            }
+        }
+        // remove tables
+        if (array_key_exists("removeTables", $pivot)) {
+            $removeTables = $pivot['removeTables'];
+            $tables = array_diff($tables, $removeTables);
+        }
+
+        //--------------------------------------------
+        // COMBINE TABLES WITH INFO
+        //--------------------------------------------
+        foreach ($tables as $table) {
+            if (array_key_exists($table, $tablesInfo)) {
+                $ret[$table] = $tablesInfo;
+            } else {
+                $ret[$table] = [];
+            }
+
+            // guess route?
+            if (false === array_key_exists("route", $ret[$table])) {
+                $ret[$table]["route"] = $this->getPivotLinkRoute($operation, $config);
+            }
+
+            // guess text?
+            if (false === array_key_exists("text", $ret[$table])) {
+                $ret[$table]["text"] = "Voir les " . $operation['elementLabelPlural'] . " de ce/cette " . $operation['elementLabel'];
+            }
+        }
         return $ret;
     }
 
-    //--------------------------------------------
-    //
-    //--------------------------------------------
 
-    protected function line($s, $indent = 0)
+    protected function getPivotLinkRoute(array $operation, array $config)
     {
-        if ($indent) {
-            $s = str_repeat("\t", $indent) . $s;
-        }
-        return $s . PHP_EOL;
+
     }
-
-
-protected f
 }
