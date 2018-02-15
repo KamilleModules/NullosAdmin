@@ -4,6 +4,7 @@
 namespace Module\NullosAdmin\Morphic\Generator\ConfigFile;
 
 
+use ArrayToString\ArrayToStringTool;
 use Bat\CaseTool;
 use Kamille\Services\XLog;
 use Kamille\Utils\Morphic\Exception\MorphicException;
@@ -29,16 +30,12 @@ class NullosFormConfigFileGenerator extends AbstractConfigFileGenerator
         $file = PhpFile::create();
 
         $table = $operation['elementTable'];
-        if (array_key_exists("elementType", $operation)) {
-            $elementType = $operation['elementType'];
-        } else {
-            $elementType = (false !== strpos($table, '_has_')) ? 'context' : 'simple';
-        }
+        $elementType = MorphicGeneratorHelper::getElementType($operation);
 
         $dbPrefixes = (array_key_exists("dbPrefixes", $config)) ? $config['dbPrefixes'] : [];
         $ric = $operation['ric'];
         $vRic = $this->getVerticalRic($ric);
-        $vRicKeys = $this->getVerticalRic($ric, true);
+        $vRicKeys = $this->getVerticalRic($ric, true, 12);
         $commaRics = '$' . implode(', $', $ric);
         $name = $operation['elementName'];
         $label = $operation['elementLabel'];
@@ -51,6 +48,7 @@ class NullosFormConfigFileGenerator extends AbstractConfigFileGenerator
         $elementObject = $this->getObjectByElementName($operation['elementName']);
         $file->addUseStatement('use Module\Ekom\Api\Object\\' . $elementObject . ";");
         $file->addUseStatement(<<<EEE
+use QuickPdo\QuickPdo;
 use Kamille\Utils\Morphic\Helper\MorphicHelper;
 use Module\Ekom\Back\User\EkomNullosUser;
 use SokoForm\Form\SokoFormInterface;
@@ -84,8 +82,8 @@ EEE
         }
 
 
-        $formInsertSuccessMsg = htmlspecialchars($operation['formInsertSuccessMsg']);
-        $formUpdateSuccessMsg = htmlspecialchars($operation['formUpdateSuccessMsg']);
+        $formInsertSuccessMsg = $operation['formInsertSuccessMsg'];
+        $formUpdateSuccessMsg = $operation['formUpdateSuccessMsg'];
 
 
         //--------------------------------------------
@@ -196,10 +194,15 @@ EEE
         //--------------------------------------------
         // FORM END
         //--------------------------------------------
+        $begin = '$isUpdate';
+        if ('context' === $elementType) {
+            $begin .= ', $avatar';
+        }
+
         $file->addBodyStatement(<<<EEE
     ,        
     'feed' => MorphicHelper::getFeedFunction("$table"),
-    'process' => function (\$fData, SokoFormInterface \$form) use (\$isUpdate, $commaRics) {
+    'process' => function (\$fData, SokoFormInterface \$form) use ($begin, $commaRics) {
 
         $onProcessBefore
 
@@ -208,18 +211,14 @@ EEE
             $elementObject::getInst()->create(\$fData);
             \$form->addNotification("$formInsertSuccessMsg", "success");
         } else {
-            $elementObject::getInst()->update(\$fData, [
-                $vRicKeys
-            ]);
+            $elementObject::getInst()->update(\$fData, $vRicKeys);
             \$form->addNotification("$formUpdateSuccessMsg", "success");
         }
         return false;
     },
     //--------------------------------------------
     // to fetch values
-    'ric' => [
-        $vRic
-    ],
+    'ric' => $vRic,
 EEE
         );
 
@@ -289,18 +288,17 @@ EEE
         return CaseTool::snakeToFlexiblePascal($name);
     }
 
-    protected function getVerticalRic(array $ric, $addKeys = false)
+    protected function getVerticalRic(array $ric, $addKeys = false, $indent = 4)
     {
-        $s = '';
-        foreach ($ric as $col) {
-            if (false === $addKeys) {
-                $s .= "'" . $col . "'," . PHP_EOL;
-            } else {
-                $s .= "'" . $col . "' => \$$col," . PHP_EOL;
-            }
+        if (false === $addKeys) {
+            return ArrayToStringTool::toPhpArray($ric, null, $indent);
         }
-        return $s;
 
+        $ret = [];
+        foreach ($ric as $col) {
+            $ret[$col] = $col;
+        }
+        return ArrayToStringTool::toPhpArray($ret, null, $indent);
     }
 
     private function getPivotTablesInfo($operation, array $config)
@@ -359,6 +357,8 @@ EEE
         //--------------------------------------------
         // COMBINE TABLES WITH INFO
         //--------------------------------------------
+        $dbPrefixes = (array_key_exists("dbPrefixes", $config)) ? $config['dbPrefixes'] : [];
+
 
         foreach ($tables as $table) {
             if (array_key_exists($table, $tablesInfo)) {
@@ -369,16 +369,16 @@ EEE
 
             // guess route?
             if (false === array_key_exists("route", $ret[$table])) {
-                $ret[$table]["route"] = $this->getPivotLinkRoute($table);
+                $ret[$table]["route"] = $this->getPivotLinkRoute($table, $dbPrefixes);
             }
 
             // guess text?
             if (false === array_key_exists("text", $ret[$table])) {
-                list($label, $labelPlural) = $this->getPivotLinkLabels($table, $operation);
+                list($label, $labelPlural) = $this->getPivotLinkLabels($table, $operation, $dbPrefixes);
                 $ret[$table]["text"] = "Voir les " . $labelPlural . " de ce/cette " . $label;
             }
 
-            $ric2Fkeys = $this->getPivotLinkRicToForeignKeys($operation, $table);
+            $ric2Fkeys = $this->getPivotLinkRicToForeignKeys($operation, $table, $dbPrefixes);
             $ret[$table]["ric2Fkeys"] = $ric2Fkeys;
 
         }
@@ -386,13 +386,13 @@ EEE
     }
 
 
-    protected function getPivotLinkRoute($table)
+    protected function getPivotLinkRoute($table, array $dbPrefixes)
     {
         throw new NullosException("override me");
 
     }
 
-    protected function getPivotLinkLabels($table, array $operation)
+    protected function getPivotLinkLabels($table, array $operation, array $dbPrefixes)
     {
         throw new NullosException("override me");
     }
@@ -401,7 +401,7 @@ EEE
      * We need to return the ric of the parent/context table
      * AND the corresponding keys in the foreign table.
      */
-    protected function getPivotLinkRicToForeignKeys(array $operation, $hasTable)
+    protected function getPivotLinkRicToForeignKeys(array $operation, $hasTable, array $dbPrefixes)
     {
         $ret = [];
         $ric = $operation['ric'];
@@ -549,8 +549,7 @@ EEE
         $sValue = '';
         if ($isInRic) {
             $sValue = '
-->setValue($' . $col . ')                
-                ';
+            ->setValue($' . $col . ')';
         }
 
         $fTable = $fkey[0] . "." . $fkey[1];

@@ -11,7 +11,8 @@ use Kamille\Utils\Morphic\Generator\MorphicGenerator;
 class NullosMorphicGenerator extends MorphicGenerator
 {
 
-    protected $configFileDir;
+    protected $configFileDirForm;
+    protected $configFileDirList;
 
 
     public function __construct()
@@ -32,7 +33,14 @@ class NullosMorphicGenerator extends MorphicGenerator
     protected function getFormConfigFileDestination(array $operation, array $config = [])
     {
         $name = $operation['elementName'] . ".form.conf.php";
-        return $this->configFileDir . "/$name";
+        return $this->configFileDirForm . "/$name";
+    }
+
+
+    protected function getListConfigFileDestination(array $operation, array $config = [])
+    {
+        $name = $operation['elementName'] . ".list.conf.php";
+        return $this->configFileDirList . "/$name";
     }
 }
 
