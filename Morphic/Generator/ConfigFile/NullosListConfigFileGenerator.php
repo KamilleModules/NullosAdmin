@@ -23,6 +23,7 @@ class NullosListConfigFileGenerator extends AbstractConfigFileGenerator
     {
 
         $file = PhpFile::create();
+        $this->onPhpFileReady($file, $operation);
 
         $dbPrefixes = (array_key_exists("dbPrefixes", $config)) ? $config['dbPrefixes'] : [];
         $ric = $operation['ric'];
@@ -32,7 +33,19 @@ class NullosListConfigFileGenerator extends AbstractConfigFileGenerator
         $table = $operation['elementTable'];
         $elementType = MorphicGeneratorHelper::getElementType($operation);
 
+
         $columns = $operation['columns'];
+        $columnTypes = $operation['columnTypes'];
+
+
+        foreach ($columns as $k => $col) {
+            // we don't show blobs: too long to load...
+            if (false !== strpos($columnTypes[$col], 'blob')) {
+                unset($columns[$k]);
+            }
+        }
+
+
         $columnFkeys = $operation['columnFkeys'];
         $fTables = [];
         foreach ($columnFkeys as $info) {
@@ -50,7 +63,8 @@ class NullosListConfigFileGenerator extends AbstractConfigFileGenerator
         if (true === $isContext) {
 
             $file->addUseStatement('use Kamille\Utils\Morphic\Helper\MorphicHelper;');
-            $contextCols = MorphicGeneratorHelper::getContextFieldsByHasTable($table, $dbPrefixes);
+            $contextCols = MorphicGeneratorHelper::getContextFieldsByHasTable($table);
+
 
             $s = '
 //--------------------------------------------
@@ -108,9 +122,11 @@ EEE;
 
         $file->addBodyStatement(<<<EEE
 \$q = "$sqlQuery";
-
 EEE
         );
+
+
+        $this->onSqlQueryAddedAfter($file, $operation);
 
 
         // queryCols
@@ -206,6 +222,12 @@ EEE
     }
 
 
+    protected function onPhpFileReady(PhpFile $file, array $operation)
+    {
+
+    }
+
+
     protected function prepareHeaderCols(array &$columns)
     {
 
@@ -235,12 +257,12 @@ EEE
 
 
         // simple element type
-        if (0 === count($contextCols)) {
-            return 'select %s from ' . $table;
+        if ('simple' === $operation['elementType']) {
+            return 'select %s from `' . $table . '`';
         }
 
         // context element type
-        $s = 'select %s from ' . $table . ' h';
+        $s = 'select %s from `' . $table . '` h';
 
 
         $rightTable = OrmToolsHelper::getHasRightTable($table, $dbPrefixes);
@@ -349,6 +371,12 @@ where ';
             $ret[] = $alias . '.' . $ai;
         }
         return $ret;
+
+    }
+
+
+    protected function onSqlQueryAddedAfter(PhpFile $file, array $operation)
+    {
 
     }
 }

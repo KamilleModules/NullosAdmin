@@ -34,6 +34,7 @@ class NullosFormConfigFileGenerator extends AbstractConfigFileGenerator
 
         $dbPrefixes = (array_key_exists("dbPrefixes", $config)) ? $config['dbPrefixes'] : [];
         $ric = $operation['ric'];
+        $hasPrimaryKey = $operation['hasPrimaryKey'];
         $vRic = $this->getVerticalRic($ric);
         $vRicKeys = $this->getVerticalRic($ric, true, 12);
         $commaRics = '$' . implode(', $', $ric);
@@ -46,7 +47,7 @@ class NullosFormConfigFileGenerator extends AbstractConfigFileGenerator
         $columnFkeys = $operation['columnFkeys'];
         $onProcessBefore = $this->getOnProcessBefore($operation, $config);
         $elementObject = $this->getObjectByElementName($operation['elementName']);
-        $file->addUseStatement('use Module\Ekom\Api\Object\\' . $elementObject . ";");
+//        $file->addUseStatement('use Module\Ekom\Api\Object\\' . $elementObject . ";");
         $file->addUseStatement(<<<EEE
 use QuickPdo\QuickPdo;
 use Kamille\Utils\Morphic\Helper\MorphicHelper;
@@ -104,12 +105,12 @@ EEE
             //--------------------------------------------
             foreach ($ric as $col) {
                 $file->addBodyStatement(<<<EEE
-\$$col = (array_key_exists('$col', \$_GET)) ? (int)\$_GET['$col'] : null;
+\$$col = (array_key_exists('$col', \$_GET)) ? \$_GET['$col'] : null;
 EEE
                 );
             }
         } else {
-            $contextCols = MorphicGeneratorHelper::getContextFieldsByHasTable($table, $dbPrefixes);
+            $contextCols = MorphicGeneratorHelper::getContextFieldsByHasTable($table);
             foreach ($contextCols as $col) {
                 $file->addBodyStatement(<<<EEE
 \$$col = MorphicHelper::getFormContextValue("$col", \$context);
@@ -124,7 +125,7 @@ EEE
             $childCols = array_diff($ric, $contextCols);
             foreach ($childCols as $col) {
                 $file->addBodyStatement(<<<EEE
-\$$col = (array_key_exists('$col', \$_GET)) ? (int)\$_GET['$col'] : null;
+\$$col = (array_key_exists('$col', \$_GET)) ? \$_GET['$col'] : null;
 EEE
                 );
             }
@@ -146,6 +147,7 @@ EEE
         //--------------------------------------------
         // FORM START
         //--------------------------------------------
+        $formName = str_replace(' ', '_', $name);
         $file->addBodyStatement(<<<EEE
         
 //--------------------------------------------
@@ -159,9 +161,15 @@ EEE
     //--------------------------------------------
     // SOKO FORM
     'form' => SokoForm::create()
-        ->setName("soko-form-$name")
+        ->setName("soko-form-$formName")
 EEE
         );
+
+
+        $contextCols = MorphicGeneratorHelper::getContextFieldsByHasTable($table);
+        if (false === $contextCols) {
+            $contextCols = [];
+        }
 
 
         //--------------------------------------------
@@ -169,6 +177,10 @@ EEE
         //--------------------------------------------
 //        az(__FILE__, $operation);
         $cols = $operation['columns'];
+        $insertCols = '';
+        $updateCols = '';
+        $updateWhere = '';
+        $indent = "\t\t\t\t";
         foreach ($cols as $col) {
             $fkey = false;
             if (array_key_exists($col, $columnFkeys)) {
@@ -185,9 +197,23 @@ EEE
                 "fkey" => $fkey,
                 "ai" => $thisAi,
                 "isInRic" => in_array($col, $ric, true),
+                "isContext" => in_array($col, $contextCols, true),
             ];
             $this->prepareControl($file, $params, $config);
 
+
+            $insertCols .= $indent . '"' . $col . '" => $fData["' . $col . '"],' . PHP_EOL;
+
+
+            $inRic = (true === in_array($col, $ric, true));
+
+            if (false === $inRic || false === $hasPrimaryKey) {
+                $updateCols .= $indent . '"' . $col . '" => $fData["' . $col . '"],' . PHP_EOL;
+            }
+
+            if (true === $inRic) {
+                $updateWhere .= $indent . '["' . $col . '", "=", $' . $col . '],' . PHP_EOL;
+            }
         }
 
 
@@ -199,14 +225,16 @@ EEE
             $begin .= ', $avatar';
         }
 
-        $file->addBodyStatement(<<<EEE
+
+        if (false) {
+
+            $file->addBodyStatement(<<<EEE
     ,        
     'feed' => MorphicHelper::getFeedFunction("$table"),
     'process' => function (\$fData, SokoFormInterface \$form) use ($begin, $commaRics) {
-
+    
         $onProcessBefore
-
-
+        
         if (false === \$isUpdate) {
             $elementObject::getInst()->create(\$fData);
             \$form->addNotification("$formInsertSuccessMsg", "success");
@@ -220,7 +248,37 @@ EEE
     // to fetch values
     'ric' => $vRic,
 EEE
-        );
+            );
+        } else {
+
+            $file->addBodyStatement(<<<EEE
+    ,        
+    'feed' => MorphicHelper::getFeedFunction("$table"),
+    'process' => function (\$fData, SokoFormInterface \$form) use ($begin, $commaRics) {
+
+        $onProcessBefore
+
+        if (false === \$isUpdate) {
+            QuickPdo::insert("$table", [
+$insertCols
+            ]);
+            \$form->addNotification("$formInsertSuccessMsg", "success");
+        } else {
+            QuickPdo::update("$table", [
+$updateCols
+            ], [
+$updateWhere            
+            ]);
+            \$form->addNotification("$formUpdateSuccessMsg", "success");
+        }
+        return false;
+    },
+    //--------------------------------------------
+    // to fetch values
+    'ric' => $vRic,
+EEE
+            );
+        }
 
 
         //--------------------------------------------
@@ -441,6 +499,7 @@ EEE
         $ai = $params['ai'];
         $label = $params['label'];
         $isInRic = $params['isInRic'];
+        $isContext = $params['isContext'];
 
 
         if ($ai) {
@@ -455,6 +514,18 @@ EEE
         )
 EEE
             );
+        } elseif ($isContext) {
+            $file->addBodyStatement(<<<EEE
+        ->addControl(SokoInputControl::create()
+            ->setName("$col")
+            ->setLabel("$label")
+            ->setProperties([
+                'readonly' => true,
+            ])
+            ->setValue(\$$col)
+        )
+EEE
+            );
         } elseif (false !== $fkey) {
             $this->doPrepareForeignKeyControl($file, $params, $config);
 
@@ -466,6 +537,15 @@ EEE
 
                 $label = ucfirst($col);
                 switch ($type) {
+                    case "tinyblob":
+                    case "blob":
+                    case "mediumblob":
+                    case "longblob":
+                        // let the user (dev) add it manually for now
+                        break;
+                    case "tinytext":
+                    case "mediumtext":
+                    case "longtext":
                     case "text":
                         $file->addBodyStatement(<<<EEE
         ->addControl(SokoInputControl::create()
@@ -555,6 +635,7 @@ EEE
         $fTable = $fkey[0] . "." . $fkey[1];
         $fCol = $fkey[2];
         $prettyColumn = OrmToolsHelper::getPrettyColumn($fTable);
+
 
         $file->addHeadStatement(<<<EEE
 \$choice_$col = QuickPdo::fetchAll("select $fCol, concat($fCol, '. ', $prettyColumn) as label from $fTable", [], \PDO::FETCH_COLUMN|\PDO::FETCH_UNIQUE);

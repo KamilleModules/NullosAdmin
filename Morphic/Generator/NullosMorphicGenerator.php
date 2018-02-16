@@ -4,6 +4,7 @@
 namespace Module\NullosAdmin\Morphic\Generator;
 
 
+use Bat\ArrayTool;
 use Bat\CaseTool;
 use Kamille\Architecture\ApplicationParameters\ApplicationParameters;
 use Kamille\Utils\Morphic\Generator\MorphicGenerator;
@@ -27,6 +28,12 @@ class NullosMorphicGenerator extends MorphicGenerator
         if (false === array_key_exists("icon", $operation)) { // this belongs to nullos
             $operation['icon'] = "fa fa-bomb";
         }
+
+
+        if (array_key_exists('ric', $operation)) {
+            ArrayTool::removeEntry("shop_id", $operation['ric']);
+        }
+
         return $operation;
     }
 
