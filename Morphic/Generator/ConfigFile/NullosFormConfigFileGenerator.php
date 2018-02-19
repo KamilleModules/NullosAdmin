@@ -45,6 +45,7 @@ class NullosFormConfigFileGenerator extends AbstractConfigFileGenerator
         $columnTypes = $operation['columnTypes'];
         $columnTypesPrecision = $operation['columnTypesPrecision'];
         $columnFkeys = $operation['columnFkeys'];
+        $nullableKeys = $operation['nullableKeys'];
         $onProcessBefore = $this->getOnProcessBefore($operation, $config);
         $elementObject = $this->getObjectByElementName($operation['elementName']);
 //        $file->addUseStatement('use Module\Ekom\Api\Object\\' . $elementObject . ";");
@@ -59,6 +60,8 @@ use SokoForm\Control\SokoInputControl;
 use SokoForm\Control\SokoChoiceControl;
 use SokoForm\Control\SokoBooleanChoiceControl;
 use Module\Ekom\Utils\E;
+use Module\Ekom\Back\Helper\BackFormHelper;
+use Module\Ekom\SokoForm\Control\EkomSokoDateControl;
 EEE
         );
 
@@ -188,21 +191,33 @@ EEE
             }
 
             $thisAi = ($ai === $col) ? $ai : false;
+            $isNullable = false;
+            if (array_key_exists($col, $nullableKeys) && true === $nullableKeys[$col]) {
+                $isNullable = true;
+            }
+
+
+            $label = ucfirst(str_replace('_', ' ', $col));
 
             $params = [
                 "column" => $col,
-                "label" => $operation['elementLabel'],
+//                "label" => $operation['elementLabel'],
+                "label" => $label,
                 "type" => $columnTypes[$col],
                 "typePrecision" => $columnTypesPrecision[$col],
                 "fkey" => $fkey,
                 "ai" => $thisAi,
                 "isInRic" => in_array($col, $ric, true),
                 "isContext" => in_array($col, $contextCols, true),
+                "isNullable" => $isNullable,
             ];
+//            az($params);
             $this->prepareControl($file, $params, $config);
 
 
-            $insertCols .= $indent . '"' . $col . '" => $fData["' . $col . '"],' . PHP_EOL;
+            if (false === $thisAi) {
+                $insertCols .= $indent . '"' . $col . '" => $fData["' . $col . '"],' . PHP_EOL;
+            }
 
 
             $inRic = (true === in_array($col, $ric, true));
@@ -306,6 +321,7 @@ EEE
                 [
                     "link" => E::link("' . $item['route'] . '") . "?' . $args . '",
                     "text" => "' . str_replace('"', '\"', $item['text']) . '",
+                    "disabled" => (array_key_exists("form", $_GET) ? true: false),
                 ],
 ';
             }
@@ -500,6 +516,8 @@ EEE
         $label = $params['label'];
         $isInRic = $params['isInRic'];
         $isContext = $params['isContext'];
+        $isNullable = $params['isNullable'];
+
 
 
         if ($ai) {
@@ -534,8 +552,9 @@ EEE
 
             if (false === $this->doPrepareColumnControl($file, $params, $config)) {
 
-
                 $label = ucfirst($col);
+
+
                 switch ($type) {
                     case "tinyblob":
                     case "blob":
@@ -555,6 +574,45 @@ EEE
         )
 EEE
                         );
+                        break;
+                    case "date":
+                        $sRequired = 'true';
+                        if ($isNullable) {
+                            $sRequired = 'false';
+                        }
+                        $sProps = '->addProperties([
+                "required" => ' . $sRequired . ',                       
+            ])
+                        ';
+                        $file->addBodyStatement(<<<EEE
+        ->addControl(EkomSokoDateControl::create()
+            ->setName("$col")
+            ->setLabel("$label")
+            $sProps
+        )
+EEE
+                        );
+
+                        break;
+                    case "datetime":
+                        $sRequired = 'true';
+                        if ($isNullable) {
+                            $sRequired = 'false';
+                        }
+                        $sProps = '->addProperties([
+                "required" => ' . $sRequired . ',                       
+            ])
+                        ';
+                        $file->addBodyStatement(<<<EEE
+        ->addControl(EkomSokoDateControl::create()
+            ->useDatetime()
+            ->setName("$col")
+            ->setLabel("$label")
+            $sProps
+        )
+EEE
+                        );
+
                         break;
                     default:
 
@@ -580,6 +638,7 @@ EEE
                         }
                         break;
                 }
+
             }
         }
     }
@@ -632,17 +691,39 @@ EEE
             ->setValue($' . $col . ')';
         }
 
-        $fTable = $fkey[0] . "." . $fkey[1];
-        $fCol = $fkey[2];
-        $prettyColumn = OrmToolsHelper::getPrettyColumn($fTable);
+
+        if (true === $this->isOfType("autocomplete", $col, $config)) {
+            /**
+             * Here, it is assumed that the foreign key ends with "_id".
+             */
+            $name = $col;
+            if ('_id' === substr($name, -3)) {
+                $name = substr($name, 0, -3);
+            }
+
+            $file->addBodyStatement(<<<EEE
+        ->addControl(            
+            SokoAutocompleteInputControl::create()
+            ->setAutocompleteOptions(BackFormHelper::createSokoAutocompleteOptions([
+                'action' => "auto.$name",
+            ]))    
+            ->setName("$col")
+            ->setLabel("$label")
+        )
+EEE
+            );
+        } else {
+            $fTable = $fkey[0] . "." . $fkey[1];
+            $fCol = $fkey[2];
+            $prettyColumn = OrmToolsHelper::getPrettyColumn($fTable);
 
 
-        $file->addHeadStatement(<<<EEE
+            $file->addHeadStatement(<<<EEE
 \$choice_$col = QuickPdo::fetchAll("select $fCol, concat($fCol, '. ', $prettyColumn) as label from $fTable", [], \PDO::FETCH_COLUMN|\PDO::FETCH_UNIQUE);
 EEE
-        );
+            );
 
-        $file->addBodyStatement(<<<EEE
+            $file->addBodyStatement(<<<EEE
         ->addControl(SokoChoiceControl::create()
             ->setName("$col")
             ->setLabel('$label')
@@ -653,6 +734,20 @@ EEE
             $sValue
         )
 EEE
-        );
+            );
+        }
+    }
+
+
+    protected function isOfType($type, $col, $config)
+    {
+        if (array_key_exists("formControlTypes", $config)) {
+            $types = $config['formControlTypes'];
+            if (array_key_exists($type, $types)) {
+                $cols = $types[$type];
+                return in_array($col, $cols, true);
+            }
+        }
+        return false;
     }
 }

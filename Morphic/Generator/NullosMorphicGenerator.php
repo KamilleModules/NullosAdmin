@@ -39,14 +39,23 @@ class NullosMorphicGenerator extends MorphicGenerator
 
     protected function getFormConfigFileDestination(array $operation, array $config = [])
     {
-        $name = $operation['elementName'] . ".form.conf.php";
+
+        /**
+         * Changed 2018-02-19 for conflicts with no namespaces
+         */
+//        $name = $operation['elementName'] . ".form.conf.php";
+        $name = $operation['elementTable'] . ".form.conf.php";
         return $this->configFileDirForm . "/$name";
     }
 
 
     protected function getListConfigFileDestination(array $operation, array $config = [])
     {
-        $name = $operation['elementName'] . ".list.conf.php";
+        /**
+         * Changed 2018-02-19 for conflicts with no namespaces
+         */
+//        $name = $operation['elementName'] . ".list.conf.php";
+        $name = $operation['elementTable'] . ".list.conf.php";
         return $this->configFileDirList . "/$name";
     }
 }

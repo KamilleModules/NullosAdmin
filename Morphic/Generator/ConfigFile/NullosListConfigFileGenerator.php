@@ -175,8 +175,33 @@ EEE
         $sRic = $this->getArraySection("ric", $ric);
 
 
+        // formRouteExtraVars (see planets/Kamille/Utils/Morphic/Generator/morphic-generator-brainstorm-2.md for more info)
+        $sExtraVars = '';
+        if (true === $isContext) {
+            if ($contextCols) {
+
+                $sExtraVars .= '
+    "formRouteExtraVars" => [               
+        ';
+                foreach ($contextCols as $col) {
+                    $sExtraVars .= '"' . $col . '" => $' . $col . ',' . PHP_EOL;
+                }
+                $sExtraVars .= '
+    ],
+                ';
+            }
+        }
+
+
         $title = $ucLabelPlural;
+
+
+        /**
+         * Changed to table 2018-02-19
+         * to avoid nonamespace conflicts (i.e. ektra_card, ek_card, ....)
+         */
         $viewId = $name;
+        $viewId = $table;
 
 
         $file->addBodyStatement(<<<EEE
@@ -196,6 +221,7 @@ EEE
     'querySkeleton' => \$q,
     $qCols
     $sRic
+    $sExtraVars
     /**
      * formRoute is just a helper, it will be used to generate the rowActions key.
      */

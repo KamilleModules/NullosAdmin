@@ -83,13 +83,29 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
         <hr>
         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <div class="row">
-                <?php foreach ($links as $el):
-                    $link = $el['link'];
-                    $text = $el['text'];
-                    ?>
-                    <a href="<?php echo htmlspecialchars($link); ?>" class="btn btn-primary"><?php echo $text; ?></a>
-                <?php endforeach; ?>
-            </div>
+                <?php foreach ($links
+
+                as $el):
+                $link = $el['link'];
+                $text = $el['text'];
+                $disabled = false;
+                if (array_key_exists("disabled", $el) && true === $el['disabled']) {
+                    $disabled = true;
+                }
+
+
+                $htmlTag = "a";
+                if (true === $disabled) {
+                    $sClass = "disabled";
+                    $htmlTag = "span";
+                }
+
+
+                ?>
+                <<?php echo $htmlTag; ?> href="<?php echo htmlspecialchars($link); ?>"
+                class="btn btn-primary <?php echo $sClass; ?>"><?php echo $text; ?></<?php echo $htmlTag; ?>>
+            <?php endforeach; ?>
+        </div>
         </div>
         <?php
     }

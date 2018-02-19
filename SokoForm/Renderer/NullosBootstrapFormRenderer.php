@@ -359,7 +359,34 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     ?>
                     <?php if (array_key_exists("date", $properties) && true === $properties['date']): ?>
 
-                    <input type="text" class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
+                    <?php if (array_key_exists("useTime", $properties) && true === $properties['useTime']): ?>
+
+                    <input type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
+                           class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
+                        <?php if (null !== $model['label']): ?>
+                            placeholder="<?php echo htmlspecialchars($model['label']); ?>"
+                        <?php endif; ?>
+                    >
+                        <span class="fa fa-calendar-o form-control-feedback left"></span>
+                        <script>
+                            jqueryComponent.ready(function () {
+
+                                //$('#<?php //echo $cssId; ?>//').timepicker($.timepicker.regional['fr']);
+
+
+                                // http://trentrichardson.com/examples/timepicker/
+                                moment.locale('<?php echo $lang; ?>'); // see init in custom.js
+                                $('#<?php echo $cssId; ?>').datetimepicker({
+                                    dateFormat: 'yy-mm-dd',
+                                    timeFormat: 'hh:mm:ss'
+                                });
+                            });
+                        </script>
+                    <?php else: ?>
+
+
+                    <input type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
+                           class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
                         <?php if (null !== $model['label']): ?>
                             placeholder="<?php echo htmlspecialchars($model['label']); ?>"
                         <?php endif; ?>
@@ -378,6 +405,10 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                 });
                             });
                         </script>
+                    <?php endif; ?>
+                        <!-- end of date -->
+
+
                     <?php else: ?>
                         <?php $this->displayInputWidget($model, $inputType, $cssId); ?>
                     <?php endif; ?>
