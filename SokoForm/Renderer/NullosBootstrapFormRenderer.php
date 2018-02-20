@@ -388,6 +388,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
                     <input type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
                            class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
+                           value="<?php echo htmlspecialchars($model['value']); ?>"
                         <?php if (null !== $model['label']): ?>
                             placeholder="<?php echo htmlspecialchars($model['label']); ?>"
                         <?php endif; ?>

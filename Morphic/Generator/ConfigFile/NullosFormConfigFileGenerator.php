@@ -519,7 +519,6 @@ EEE
         $isNullable = $params['isNullable'];
 
 
-
         if ($ai) {
             $file->addBodyStatement(<<<EEE
         ->addControl(SokoInputControl::create()
@@ -713,15 +712,14 @@ EEE
 EEE
             );
         } else {
-            $fTable = $fkey[0] . "." . $fkey[1];
-            $fCol = $fkey[2];
-            $prettyColumn = OrmToolsHelper::getPrettyColumn($fTable);
 
 
+            $foreignListQuery = $this->getForeignListQuery($fkey, $config, $file);
             $file->addHeadStatement(<<<EEE
-\$choice_$col = QuickPdo::fetchAll("select $fCol, concat($fCol, '. ', $prettyColumn) as label from $fTable", [], \PDO::FETCH_COLUMN|\PDO::FETCH_UNIQUE);
+\$choice_$col = QuickPdo::fetchAll("$foreignListQuery", [], \PDO::FETCH_COLUMN|\PDO::FETCH_UNIQUE);
 EEE
             );
+
 
             $file->addBodyStatement(<<<EEE
         ->addControl(SokoChoiceControl::create()
@@ -736,6 +734,32 @@ EEE
 EEE
             );
         }
+    }
+
+
+    protected function getForeignListQuery($fkey, array $config, PhpFile $file)
+    {
+        $fTable = $fkey[0] . "." . $fkey[1];
+        $fCol = $fkey[2];
+
+
+        if (array_key_exists("formFkRequest", $config)) {
+            $id = $fkey[1] . "." . $fCol;
+            if (array_key_exists($id, $config['formFkRequest'])) {
+                $r = $config["formFkRequest"][$id];
+                $this->prepareCustomForeignQuery($r, $config, $file);
+                return $r;
+            }
+        }
+
+
+        $prettyColumn = OrmToolsHelper::getPrettyColumn($fTable);
+        return "select $fCol, concat($fCol, \\\". \\\", $prettyColumn) as label from $fTable";
+    }
+
+    protected function prepareCustomForeignQuery(&$query)
+    {
+
     }
 
 

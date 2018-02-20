@@ -129,6 +129,7 @@ EEE
         $this->onSqlQueryAddedAfter($file, $operation);
 
 
+
         // queryCols
         if (true === $isContext) {
             $queryCols = array_map(function ($v) {
@@ -148,6 +149,9 @@ EEE
             // headersVisibility
             $vis = [];
             foreach ($contextCols as $col) {
+                $vis[$col] = false;
+            }
+            foreach ($columnFkeys as $col => $info) {
                 $vis[$col] = false;
             }
             $sVis = $this->getArraySection('headersVisibility', $vis);
@@ -300,13 +304,12 @@ EEE
             foreach ($columnFkeys as $fkey => $info) {
 
                 $ftable = $info[1];
-
-
                 $alias = $fTable2Alias[$ftable];
                 $s .= ' 
 inner join ' . $ftable . ' ' . $alias . ' on ' . $alias . '.' . $info[2] . '=h.' . $fkey;
 
             }
+
         } else {
             throw new NullosException("right table not found for table $table");
         }
@@ -360,10 +363,11 @@ where ';
         $s = 'concat(';
 
         $ai = QuickPdoInfoTool::getAutoIncrementedField($table);
+
         $repr = $alias . "." . OrmToolsHelper::getRepresentativeColumn($table);
 
         if (false !== $ai) {
-            $s .= $alias . '.' . $ai . ", ";
+            $s .= $alias . '.' . $ai . ", " . '". ", ';
         }
         $s .= $repr;
 
