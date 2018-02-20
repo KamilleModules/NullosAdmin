@@ -293,6 +293,7 @@ EEE
 
         $rightTable = OrmToolsHelper::getHasRightTable($table, $dbPrefixes);
 
+
         if (false !== $rightTable) {
             $fTable2Alias = $operation['fTable2Alias'];
             $columnFkeys = $operation['columnFkeys'];
@@ -301,12 +302,10 @@ EEE
                 $ftable = $info[1];
 
 
-                if ($rightTable === $ftable) {
+                $alias = $fTable2Alias[$ftable];
+                $s .= ' 
+inner join ' . $ftable . ' ' . $alias . ' on ' . $alias . '.' . $info[2] . '=h.' . $fkey;
 
-                    $alias = $fTable2Alias[$ftable];
-                    $s .= ' 
-inner join ' . $rightTable . ' ' . $alias . ' on ' . $alias . '.' . $info[2] . '=h.' . $fkey;
-                }
             }
         } else {
             throw new NullosException("right table not found for table $table");
