@@ -35,6 +35,7 @@ class NullosFormConfigFileGenerator extends AbstractConfigFileGenerator
         $dbPrefixes = (array_key_exists("dbPrefixes", $config)) ? $config['dbPrefixes'] : [];
         $ric = $operation['ric'];
         $hasPrimaryKey = $operation['hasPrimaryKey'];
+        $vRic = $this->getVerticalRic($ric);
         $vRicKeys = $this->getVerticalRic($ric, true, 12);
         $commaRics = '$' . implode(', $', $ric);
         $name = $operation['elementName'];
@@ -100,15 +101,6 @@ EEE
         );
 
 
-        $phpRic = ArrayToStringTool::toPhpArray($ric);
-
-
-        $file->addBodyStatement(<<<EEE
-\$ric=$phpRic;
-EEE
-        );
-
-
         if ("simple" === $elementType) {
 
             //--------------------------------------------
@@ -151,7 +143,7 @@ EEE
 //--------------------------------------------
 // UPDATE|INSERT MODE
 //--------------------------------------------
-$isUpdate = MorphicHelper::getIsUpdate($ric);
+$isUpdate = (false === array_key_exists("form", $_GET));
 EEE
         );
 
@@ -269,7 +261,7 @@ EEE
     },
     //--------------------------------------------
     // to fetch values
-    'ric' => \$ric,
+    'ric' => $vRic,
 EEE
             );
         } else {
@@ -298,7 +290,7 @@ $updateWhere
     },
     //--------------------------------------------
     // to fetch values
-    'ric' => \$ric,
+    'ric' => $vRic,
 EEE
             );
         }
@@ -329,7 +321,7 @@ EEE
                 [
                     "link" => E::link("' . $item['route'] . '") . "?' . $args . '",
                     "text" => "' . str_replace('"', '\"', $item['text']) . '",
-                    "disabled" => !$isUpdate,
+                    "disabled" => (array_key_exists("form", $_GET) ? true: false),
                 ],
 ';
             }
@@ -540,9 +532,6 @@ EEE
 EEE
             );
         } elseif ($isContext) {
-            /**
-             * Could even be hidden?
-             */
             $file->addBodyStatement(<<<EEE
         ->addControl(SokoInputControl::create()
             ->setName("$col")
@@ -765,7 +754,7 @@ EEE
 
 
         $prettyColumn = OrmToolsHelper::getPrettyColumn($fTable);
-        return "select $fCol, concat($fCol, \\\". \\\", $prettyColumn) as label from $fTable";
+        return "select $fCol, concat($fCol, \". \", $prettyColumn) as label from $fTable";
     }
 
     protected function prepareCustomForeignQuery(&$query)
