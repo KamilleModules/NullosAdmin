@@ -48,9 +48,23 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <?php endif; ?>
             <?php endforeach; ?>
 
+
+
+
+            <div class="dropzone"></div>
+
+
             <?php $r->submitKey(); ?>
             <?php $r->submitButton(); ?>
         </form>
+
+
+        <script>
+            jqueryComponent.ready(function () {
+                $(".dropzone").dropzone({ url: "/file/post" });
+            });
+        </script>
+
         <?php
     }
 
