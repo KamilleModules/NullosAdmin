@@ -6,6 +6,7 @@ namespace Module\NullosAdmin\SokoForm\Renderer;
 
 use Bat\StringTool;
 use Core\Services\Hooks;
+use Module\Ekom\Utils\E;
 use SokoForm\Form\SokoFormInterface;
 use SokoForm\Renderer\SokoFormRenderer;
 use Theme\NullosTheme;
@@ -49,21 +50,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <?php endforeach; ?>
 
 
-
-
-            <div class="dropzone"></div>
-
-
             <?php $r->submitKey(); ?>
             <?php $r->submitButton(); ?>
         </form>
-
-
-        <script>
-            jqueryComponent.ready(function () {
-                $(".dropzone").dropzone({ url: "/file/post" });
-            });
-        </script>
 
         <?php
     }
@@ -124,6 +113,49 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     protected function renderAutocompleteInputText(array $model, array $preferences = [])
     {
         $this->doRenderInputControl($model, $preferences);
+    }
+
+    protected function renderFileSafeUpload(array $model, array $preferences = [])
+    {
+
+        $cssId = StringTool::getUniqueCssId("select-");
+        $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
+        $readOnly = (array_key_exists("readonly", $properties) && (true === $properties['readonly']));
+        $sDisabled = "";
+        if (true === $readOnly) {
+            $sDisabled = ' disabled="true"';
+        }
+
+        $sErrorClass = "";
+        if ($model['errors']) {
+            $sErrorClass = "soko-error-container soko-active";
+        }
+
+        $profileId = $model['profileId'];
+        $payload = $model['payload'];
+
+
+        ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
+                <div class="dropzone"></div>
+                <script>
+                    jqueryComponent.ready(function () {
+                        $(".dropzone").dropzone({
+                            url: "<?php echo E::getEcpUri("upload_handler", [
+                                'profile_id' => $profileId,
+                                'payload' => $payload,
+                            ]); ?>"
+                        });
+                    });
+                </script>
+
+
+                <?php $this->doRenderError($model, $preferences); ?>
+            </div>
+        </div>
+        <?php
     }
 
     protected function renderChoiceList(array $model, array $preferences = [])
@@ -377,7 +409,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
                     <input type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
                            class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
-                            value="<?php echo htmlspecialchars($model['value']); ?>"
+                           value="<?php echo htmlspecialchars($model['value']); ?>"
                         <?php if (null !== $model['label']): ?>
                             placeholder="<?php echo htmlspecialchars($model['label']); ?>"
                         <?php endif; ?>
