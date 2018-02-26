@@ -475,6 +475,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     public function submitButton(array $preferences = [])
     {
         $label = $this->getPreference("label", $preferences, "Submit");
+        $labelUpdate = $this->getPreference("labelUpdate", $preferences, "Submit and update");
         $attributes = $this->getPreference("attributes", $preferences, []);
         unset($attributes['class']);
         ?>
@@ -482,6 +483,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         <div class="form-group">
             <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                 <button type="submit" class="btn btn-success"><?php echo $label; ?></button>
+                <button name="submit-and-update" value="1" type="submit" class="btn btn-info" ><?php echo $labelUpdate; ?></button>
             </div>
         </div>
         <?php
