@@ -483,7 +483,10 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         <div class="form-group">
             <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                 <button type="submit" class="btn btn-success"><?php echo $label; ?></button>
-                <button name="submit-and-update" value="1" type="submit" class="btn btn-info" ><?php echo $labelUpdate; ?></button>
+                <?php if (array_key_exists('form', $_GET) && 1 === count($_GET)): ?>
+                    <button name="submit-and-update" value="1" type="submit"
+                            class="btn btn-info"><?php echo $labelUpdate; ?></button>
+                <?php endif; ?>
             </div>
         </div>
         <?php
