@@ -1,14 +1,15 @@
 <!-- _coverpage.md -->
 
-![logo](_media/icon.svg)
+<img src="image/nullos-admin.png" alt="Drawing" style="width: 128px;"/>
 
-# Nullos Admin <small>0.1</small>
+# Nullos Admin Docs <small>1.0</small>
 
 > Un backoffice pour toutes vos applications
 
-* Simple and lightweight (~19kB gzipped)
-* No statically built html files
-* Multiple themes
 
-[GitHub](https://github.com/QingWei-Li/docsify/)
+
+[GitHub](https://github.com/lingtalfi/nullos-admin)
 [Get Started](#kamille)
+
+
+![color](rgb(215, 227, 230))

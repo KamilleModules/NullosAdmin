@@ -1,0 +1,38 @@
+.fancy-tree-widget {
+  .fancy-tree-widget-table {
+
+    width: 100%;
+    //table-layout: fixed;
+    //
+    //tr td:nth-of-type(1) {
+    //  text-align: right;
+    //}
+    //tr td:nth-of-type(2) {
+    //  text-align: center;
+    //}
+    //tr td:nth-of-type(3) {
+    //  min-width: 100px;
+    //  white-space: nowrap;
+    //  overflow: hidden;
+    //  text-overflow: ellipsis;
+    //}
+
+    /*------------------------------------
+    - SELF
+    ------------------------------------*/
+    tr {
+      td:nth-child(2) {
+        padding-left: 5px;
+
+      }
+      span.fancytree-icon {
+        margin-top: 5px;
+      }
+      td{
+        padding: 2px 5px;
+      }
+    }
+  }
+}
+
+

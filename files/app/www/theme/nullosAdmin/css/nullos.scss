@@ -1,0 +1,251 @@
+.default-modal-loader-container {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*------------------------------------
+- BOOTSTRAP FIXes
+------------------------------------*/
+.x_title span.badge {
+  color: white;
+}
+
+/*------------------------------------
+- EXTENDING CONTROL SIZING
+// https://stackoverflow.com/questions/22920589/bootstrap-3-input-xs-smaller-than-sm
+------------------------------------*/
+.input-xs {
+  height: 26px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
+
+.morphic-table {
+
+  .filter-bar td {
+    background: #e6f1f8;
+    vertical-align: middle;
+
+    input {
+      background: #f7fdff;
+      border: 1px solid #e6f4ff;
+      padding: 5px;
+      border-radius: 5px;
+    }
+  }
+
+  thead {
+    tr {
+      background: white;
+
+      th.sorting_desc,
+      th.sorting_asc {
+        background-color: #f4f4ff;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      background: white;
+
+      &.filter-bar {
+        .has-content {
+          background-color: #b7b7c5;
+        }
+      }
+
+      td {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .dropdown-menu > li > a {
+    padding: 3px 9px;
+  }
+
+  &.table-hover > tbody > tr:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+  }
+
+}
+
+.morphic-table-container-small {
+  .morphic-table {
+
+    .filter-bar td {
+      input {
+        padding: 0 0 0 3px;
+      }
+    }
+
+    tbody {
+      tr {
+        background: white;
+        td {
+          padding: 0 0 0 5px;
+          .btn {
+            padding: 0 12px;
+            margin: 5px 0px;
+          }
+        }
+      }
+    }
+  }
+}
+
+/*------------------------------------
+- PAGE TOP
+------------------------------------*/
+.pagetop {
+  .title_right_container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 9px;
+  }
+}
+
+/*------------------------------------
+- LIST ADMIN
+------------------------------------*/
+.panel_toolbox {
+  & > li {
+
+    & > a {
+      color: #88A9EA;
+    }
+
+    &.disabled {
+      & > a {
+        color: #C5C7CB;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &.morphic-panel-toolbox {
+    min-width: auto;
+
+  }
+}
+
+/*------------------------------------
+- FORM
+------------------------------------*/
+.soko-form {
+
+  .soko-error-container {
+
+    .soko-error-parent {
+      display: none;
+    }
+
+    &.soko-active {
+
+      .soko-error-parent {
+        display: block;
+        width: 100%;
+        margin-top: .25rem;
+        font-size: 80%;
+        color: #dc3545;
+      }
+
+      input {
+        border-color: #dc3545;
+      }
+      select {
+        border-color: #dc3545;
+      }
+      textarea {
+        border-color: #dc3545;
+      }
+    }
+  }
+
+  .switchery-label {
+    margin-top: 5px;
+  }
+
+  .auto-complete-container {
+    input.form-control-feedback {
+      font-size: 0.7em;
+    }
+  }
+}
+
+.btn {
+  &.disabled {
+    pointer-events: auto !important;
+    cursor: not-allowed !important;
+  }
+}
+
+.btn-pulse-color {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #cc0500;
+    color: white;
+  }
+  50% {
+    background-color: #fff;
+    color: black;
+  }
+  100% {
+    background-color: #cc0500;
+    color: white;
+  }
+}
+
+.pagetop-buttonslist {
+  &.dropleft .dropdown-menu {
+    margin-top: 0;
+    position: absolute;
+    right: 0;
+    left: auto;
+  }
+
+  .btn-sm {
+    font-size: 12px;
+  }
+}
+
+/*------------------------------------
+- GENERAL
+------------------------------------*/
+.nullos-dashboard {
+  .nul_smaller {
+    font-size: 0.8em;
+  }
+
+  .no-border-bottom{
+    border-bottom: none;
+  }
+
+  .bar_separator{
+    background: #cdd2e9;
+    padding: 8px;
+    color: #264f8d;
+  }
+
+  ul.stats-overview li{
+    width: 15.5%;
+  }
+
+  .stat-cat{
+    &.active{
+      background: #e5d7f9;;
+    }
+  }
+}
+
+
