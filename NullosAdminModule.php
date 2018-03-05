@@ -19,6 +19,7 @@ class NullosAdminModule extends KamilleModule
     protected function getPlanets()
     {
         return [
+            'ling.DirScanner',
             'ling.Kamille',
             'ling.Models',
             'ling.ModelRenderers',
