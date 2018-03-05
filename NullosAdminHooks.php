@@ -8,63 +8,78 @@ namespace Module\NullosAdmin;
 
 class NullosAdminHooks
 {
-
-    /**
-     * @param data , array:
-     *      - 0: controller instance
-     *      - 1: laws config
-     */
-    protected static function Core_autoLawsConfig(&$data)
-    {
-        $autoJsScript = "/theme/" . \Kamille\Architecture\ApplicationParameters\ApplicationParameters::get("theme") . "/controllers/" . \Bat\ClassTool::getShortName($data[0]) . ".js";
-        $file = \Kamille\Architecture\ApplicationParameters\ApplicationParameters::get("app_dir") . "/www" . $autoJsScript;
-        if (file_exists($file)) {
-            /**
-             * @var $conf \Kamille\Utils\Laws\Config\LawsConfig
-             */
-            $conf = $data[1];
-            $conf->replace(function (array &$c) use ($autoJsScript) {
-                $c['layout']['conf']["jsScripts"][] = $autoJsScript;
-            });
-        }
-    }
-
-    protected static function Core_addLawsUtilProxyDecorators(\Kamille\Mvc\LayoutProxy\LawsLayoutProxyInterface $layoutProxy)
-    {
-        if ($layoutProxy instanceof \Kamille\Mvc\LayoutProxy\LawsLayoutProxy) {
-            $layoutProxy->addDecorator(\Kamille\Mvc\WidgetDecorator\Bootstrap3GridWidgetDecorator::create());
-        }
-    }
-
-
+    //--------------------------------------------
+    // NULLOS ADMIN
+    //--------------------------------------------
     protected static function NullosAdmin_layout_addTopBarRightWidgets(array &$topbarRightWidgets)
     {
+        // mit-start:MyWildCode
+        $prefixUri = "/theme/" . \Kamille\Architecture\ApplicationParameters\ApplicationParameters::get("theme");
+        $imgPrefix = $prefixUri . "/production";
 
-    }
+        unset($topbarRightWidgets['topbar_right.userMessages']);
 
-    protected static function NullosAdmin_layout_sideBarMenuModel(array &$sideBarMenuModel)
-    {
-
-    }
-
-    protected static function DataTable_getRendererClassName(array &$renderer)
-    {
-        $renderer = 'Module\NullosAdmin\ModelRenderers\DataTable\NullosDataTableRenderer';
-    }
-
-
-    protected static function Core_ModalGscpResponseDefaultButtons(array &$buttons)
-    {
-        $buttons = [
-            "close" => [
-                "flavour" => "default",
-                "label" => "Close",
-                "htmlAttr" => [
-                    "data-dismiss" => "modal",
+        $topbarRightWidgets["topbar_right.shopListDropDown"] = [
+            "tpl" => "Ekom/ShopListDropDown/prototype",
+            "conf" => [
+                'nbMessages' => 10,
+                'badgeColor' => 'red',
+                'showAllMessagesLink' => true,
+                'allMessagesText' => "See All Alerts",
+                'allMessagesLink' => "/user-alerts",
+                "messages" => [
+                    [
+                        "link" => "/ji",
+                        "title" => "John Smith",
+                        "image" => $imgPrefix . '/images/ling.jpg',
+                        "aux" => "3 mins ago",
+                        "message" => "Film festivals used to be do-or-die moments for movie makers. They were where...",
+                    ],
+                    [
+                        "link" => "/ji",
+                        "title" => "John Smith",
+                        "image" => $imgPrefix . '/images/img.jpg',
+                        "aux" => "12 mins ago",
+                        "message" => "Film festivals used to be do-or-die moments for movie makers. They were where...",
+                    ],
                 ],
             ],
         ];
+        // mit-end:MyWildCode
     }
+
+    protected static function NullosAdmin_layout_sideBarMenuModelObject(\Models\AdminSidebarMenu\Lee\LeeAdminSidebarMenuModel $sideBarMenuModel)
+    {
+
+    }
+
+
+
+    protected static function NullosAdmin_layout_topNotifications(array &$topNotifications)
+    {
+
+    }
+
+
+    protected static function NullosAdmin_prepareHomePageClaws(\Kamille\Utils\Claws\ClawsInterface $claws)
+    {
+
+    }
+
+//    protected static function NullosAdmin_SokoForm_NullosBootstrapRenderer_AutocompleteInitialValue(&$label, $action, $value)
+//    {
+//        BackHooksHelper::NullosAdmin_SokoForm_NullosBootstrapRenderer_AutocompleteInitialValue($label, $action, $value);
+//    }
+//
+//    protected static function NullosAdmin_User_hasRight(&$hasRight, $privilege)
+//    {
+//        BackHooksHelper::NullosAdmin_User_hasRight($hasRight, $privilege);
+//    }
+//
+//    protected static function NullosAdmin_User_populateConnectedUser(array &$user)
+//    {
+//        BackHooksHelper::NullosAdmin_User_populateConnectedUser($user);
+//    }
 
 }
 

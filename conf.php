@@ -14,6 +14,12 @@ $conf = [
     // UPLOAD MANAGEMENT
     //--------------------------------------------
     'uploadDirName' => "upload-handler",
+
+    //--------------------------------------------
+    // CONNEXION
+    //--------------------------------------------
+    'controllerLoginForm' => "Controller\NullosAdmin\Back\LoginController:renderClaws",
+    'disconnectGetKey' => "disconnect",
 ];
 
 

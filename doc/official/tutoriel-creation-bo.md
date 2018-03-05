@@ -107,4 +107,7 @@ Note: l'url de gentelella est: https://colorlib.com/polygon/gentelella/index.htm
         - remplacement de HtmlPageHelper::js("/theme/lee/libs/bionic/bionic.js", null, null, false);
             vers HtmlPageHelper::js($prefixUri . "/lib/bionic/bionic.js", null, null, false);
     - ajout d'assets dans stats            
-- ajout de la librairie bionic dans le theme: www/theme/nullosAdmin/lib/bionic/bionic.js        
+- ajout de la librairie bionic dans le theme: www/theme/nullosAdmin/lib/bionic/bionic.js
+
+
+- Ajout du widget Core/Exception (theme/nullosAdmin/widgets/Core/Exception)        
