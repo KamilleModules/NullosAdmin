@@ -1,0 +1,9 @@
+This note will be read when the installation is executed.
+This mechanism is part of the Kamille module installation process.
+
+The installation went ok, but you might want to do the following:
+
+- x
+- y
+- z
+
