@@ -4,3 +4,6 @@
 * Services, Hooks, Config
   * [Hooks](hooks.md)
   
+  
+* FAQ
+  * [Les questions les plus fréquentes](faq.md)

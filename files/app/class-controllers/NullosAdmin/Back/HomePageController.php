@@ -19,7 +19,7 @@ class HomePageController extends NullosBaseController
             ->setTemplate('NullosAdmin/Main/Dashboard/default')
             ->setConf([])
         );
-        Hooks::call("NullosAdmin_prepareHomePageClaws", $claws);
+        Hooks::call("NullosAdmin_prepareClaws", $claws, "home");
         parent::prepareClaws();
     }
 

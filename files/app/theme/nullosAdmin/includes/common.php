@@ -32,6 +32,7 @@ HtmlPageHelper::js("$prefixUri/vendors/fastclick/lib/fastclick.js", null, null, 
 HtmlPageHelper::js("$prefixUri/vendors/nprogress/nprogress.js", null, null, false);
 NullosTheme::useLib("pnotify");
 NullosTheme::useLib("bionic");
+NullosTheme::useLib("ekomApi");
 
 
 

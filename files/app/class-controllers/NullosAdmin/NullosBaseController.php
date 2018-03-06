@@ -12,20 +12,12 @@ use Kamille\Utils\Claws\ClawsWidget;
 use Models\AdminSidebarMenu\Lee\LeeAdminSidebarMenuModel;
 use Module\Ekom\Utils\E;
 use Module\NullosAdmin\Authenticate\User\NullosUser;
+use Module\NullosAdmin\Helper\NullosGuiEnvironment;
 use Module\NullosAdmin\Session\NullosSession;
 use Module\NullosAdmin\Utils\N;
 
 class NullosBaseController extends KamilleClawsController
 {
-    protected $notifications;
-
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->notifications = [];
-
-    }
 
     protected function handleClawsException(\Exception $e)
     {
@@ -200,11 +192,12 @@ class NullosBaseController extends KamilleClawsController
             );
 
 
-        if ($this->notifications) {
+        $notifs = NullosGuiEnvironment::getNotifications();
+        if ($notifs) {
             $this->getClaws()->setWidget("notifications.notif", ClawsWidget::create()
                 ->setTemplate("NullosAdmin/Notifications/Notifications/default")
                 ->setConf([
-                    "notifications" => $this->notifications,
+                    "notifications" => $notifs,
                 ])
             );
         }
@@ -214,11 +207,7 @@ class NullosBaseController extends KamilleClawsController
 
     protected function addNotification($message, $type, $title = null)
     {
-        $this->notifications[] = [
-            "message" => $message,
-            "type" => $type,
-            "title" => $title,
-        ];
+        NullosGuiEnvironment::addNotification($message, $type, $title);
     }
 
 }
