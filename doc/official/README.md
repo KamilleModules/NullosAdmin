@@ -36,19 +36,30 @@ Les modules peuvent placer des éléments dans ces zones.
 Installation
 ----------------
 
-NullosAdmin est une planète appartenant à la librairie [universe](https://github.com/karayabin/universe-snapshot)
-est peut donc être installé avec l'outil en ligne de commande [uni](https://github.com/lingtalfi/universe-naive-importer).
 
-```bash
-uni import NullosAdmin
+
+NullosAdmin est un module du [framework kamille](https://github.com/lingtalfi/Kamille).
+Pour l'installer, vous pouvez donc utiliser l'outil [kit](https://github.com/lingtalfi/kamille-installer-tool).
+
+```php
+kamille install NullosAdmin
 ```
 
-
-NullosAdmin est également un module du framework [kamille](https://github.com/lingtalfi/Kamille), il peut donc être 
-installé comme tel également.
+La commande ci-dessus va importer ET installer le module NullosAdmin dans l'application kamille courante.
 
 
 
 
 
+Utilisation
+----------------
 
+Pour apprendre à utiliser NullosAdmin, je vous conseille de commencer par un tutoriel (dans le menu de gauche).
+
+
+
+
+Le thème 
+--------------
+
+Le thème utilisé par NullosAdmin est https://colorlib.com/polygon/gentelella/index.html.
