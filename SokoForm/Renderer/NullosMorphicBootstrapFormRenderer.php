@@ -17,7 +17,7 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
     {
 
         $form = $conf['form'];
-        parent::displayForm($form, $cssId);
+        parent::displayForm($form, $cssId, $conf);
         if (array_key_exists("formAfterElements", $conf)) {
             $els = $conf['formAfterElements'];
             foreach ($els as $el) {

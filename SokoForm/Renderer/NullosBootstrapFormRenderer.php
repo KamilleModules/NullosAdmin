@@ -20,8 +20,18 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     }
 
 
-    public static function displayForm(SokoFormInterface $form, $cssId = null)
+    public static function displayForm(SokoFormInterface $form, $cssId = null, array $options = [])
     {
+
+        $options = array_replace([
+            "description" => null,
+            "submitBtnLabel" => null,
+        ], $options);
+        $submitBtnPreferences = [
+            "label" => $options['submitBtnLabel'],
+        ];
+        $description = $options['description'];
+
 
         if (null === $cssId) {
             $cssId = StringTool::getUniqueCssId("form-");
@@ -41,6 +51,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 novalidate=""
         >
             <?php $r->notifications(); ?>
+
+            <?php if (null !== $description): ?>
+                <?php echo $description; ?>
+            <?php endif; ?>
+
             <?php
             $name = $form->getName();
             foreach ($controlNames as $col): ?>
@@ -51,7 +66,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
             <?php $r->submitKey(); ?>
-            <?php $r->submitButton(); ?>
+            <?php $r->submitButton($submitBtnPreferences); ?>
         </form>
 
         <?php
