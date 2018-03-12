@@ -13,7 +13,7 @@ class NullosMorphicGenerator2 extends MorphicGenerator2
     protected function getTableRouteByTable($table)
     {
         $camel = $this->getCamelByTable($table);
-        return "NullosAdmin_Ekom_Generated_" . $camel . "_List";
+        return "NullosAdmin_Generated_" . $camel . "_List";
     }
 }
 

@@ -5,6 +5,7 @@ namespace Module\NullosAdmin\SokoForm\Renderer;
 
 
 use Bat\StringTool;
+use Core\Services\A;
 use Core\Services\Hooks;
 use Module\Ekom\Utils\E;
 use SokoForm\Form\SokoFormInterface;
@@ -23,9 +24,12 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     public static function displayForm(SokoFormInterface $form, $cssId = null, array $options = [])
     {
 
+        NullosTheme::useLib("form");
+
+
         $options = array_replace([
             "description" => null,
-            "submitBtnLabel" => null,
+            "submitBtnLabel" => "Submit",
         ], $options);
         $submitBtnPreferences = [
             "label" => $options['submitBtnLabel'],
@@ -153,7 +157,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         ?>
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
+            <div class="col-md-9 col-sm-9 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
                 <div class="dropzone"></div>
                 <script>
                     jqueryComponent.ready(function () {
@@ -195,7 +199,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <?php if (array_key_exists("listenTo", $properties)): ?>
                 <div class="form-group">
                     <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-                    <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
+                    <div class="col-md-9 col-sm-9 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
                         <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
                                                           id="<?php echo $cssId; ?>"
                                                           class="form-control has-feedback-left">
@@ -257,7 +261,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
                 <div class="form-group">
                     <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-                    <div class="col-md-6 col-sm-6 col-xs-12 <?php echo $sErrorClass; ?>">
+                    <div class="col-md-9 col-sm-9 col-xs-12 <?php echo $sErrorClass; ?>">
                         <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
                                                           id="<?php echo $cssId; ?>"
                                                           class="form-control">
@@ -279,7 +283,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     </div>
                 </div>
 
+
             <?php endif; ?>
+            <?php echo $this->renderExtraLink($properties); ?>
             <?php
 
         } else {
@@ -293,7 +299,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         ?>
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-            <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="col-md-9 col-sm-9 col-xs-12">
                 <div class="">
                     <label class="switchery-label">
                         <input name="<?php echo htmlspecialchars($model['name']); ?>" type="checkbox"
@@ -302,6 +308,356 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 </div>
             </div>
         </div>
+        <?php
+
+    }
+
+
+    protected function renderComboboxChoice(array $model, array $preferences = [])
+    {
+
+        $cssId = StringTool::getUniqueCssId("combobox-");
+        $cssId2 = StringTool::getUniqueCssId("sortbox-");
+        $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
+        $readOnly = (array_key_exists("readonly", $properties) && (true === $properties['readonly']));
+        $sDisabled = "";
+        if (true === $readOnly) {
+            $sDisabled = ' disabled="true"';
+        }
+
+        $sErrorClass = "";
+        if ($model['errors']) {
+            $sErrorClass = "soko-error-container soko-active";
+        }
+
+
+        $useSortBox = (array_key_exists("useSortBox", $properties) && true === $properties['useSortBox']) ? true : false;
+
+        $comboBoxName = $model['name'];
+        $sortBoxName = $model['name'];
+        if (true === $useSortBox) {
+            $comboBoxName = null;
+        }
+
+
+        /**
+         * if useSortBox, it's an array of values
+         */
+        $comboboxValue = $model['value'];
+
+        ?>
+
+
+        <style>
+            .custom-combobox {
+                position: relative;
+                display: inline-block;
+                width: 95%;
+            }
+
+            .custom-combobox-toggle {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                margin-left: -1px;
+                padding: 0;
+            }
+
+            .custom-combobox-input {
+                margin: 0;
+                padding: 5px 10px;
+                width: 100%;
+            }
+
+            .combobox-sortbox {
+                min-height: 130px;
+                border: 1px solid #dbdbdb;
+            }
+
+            .combobox-sortbox .combobox-sort-item {
+                cursor: move;
+            }
+
+            .combobox-sortbox .combobox-sort-item.focused {
+                background: #2759c2;
+                color: white;
+            }
+        </style>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+            <div class="col-md-9 col-sm-9 col-xs-12 <?php echo $sErrorClass; ?>">
+                <div class="ui-widget">
+                    <select <?php echo $sDisabled; ?>
+
+                        <?php if ($comboBoxName): ?>
+                            name="<?php echo htmlspecialchars($comboBoxName); ?>"
+                        <?php endif; ?>
+
+                            id="<?php echo $cssId; ?>"
+                            class="form-control">
+                        <?php foreach ($model['choices'] as $value => $label):
+                            if ($useSortBox) {
+                                $sSel = (in_array($value, $comboboxValue, true)) ? ' selected="selected"' : '';
+                            } else {
+                                $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
+                            }
+                            ?>
+                            <option
+                                <?php echo $sSel; ?>
+                                    value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php $this->doRenderError($model, $preferences); ?>
+
+            </div>
+        </div>
+
+
+        <?php if (true === $useSortBox):
+        $sortBoxValues = [];
+        foreach ($comboboxValue as $value) {
+            $label = $model['choices'][$value];
+            $sortBoxValues[$value] = $label;
+        }
+
+        ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+            <div class="col-md-9 col-sm-9 col-xs-12 <?php echo $sErrorClass; ?>">
+                <div
+                        id="<?php echo $cssId2; ?>"
+                        class="form-control combobox-sortbox">
+                    <?php foreach ($sortBoxValues as $value => $label): ?>
+                        <div class="combobox-sort-item"><input type="hidden" name="<?php echo $sortBoxName ?>[]"
+                                                                       value="<?php echo $value; ?>"><?php echo $label; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="row action-buttons">
+                    <div class="col-sm-4">
+                        <button type="button" class="move_up btn btn-block"><i
+                                    class="glyphicon glyphicon-arrow-up"></i></button>
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="button" class="move_down btn btn-block col-sm-4"><i
+                                    class="glyphicon glyphicon-arrow-down"></i></button>
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="button" class="remove btn btn-block col-sm-4"><i
+                                    class="glyphicon glyphicon-remove"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+
+        <script>
+
+            jqueryComponent.ready(function () {
+
+                var jSortBox = $('#<?php echo $cssId2; ?>');
+                var jSortActionButtons = jSortBox.next(".action-buttons");
+                var jCombobox = $("#<?php echo $cssId; ?>");
+
+
+                function onComboBoxSelect(value, text) {
+                    <?php if(true === $useSortBox): ?>
+
+
+                    if ('unique') {
+                        var jInput = jSortBox.find('input[value="' + value + '"]');
+                        if (jInput.length) {
+                            jSortBox.find('.combobox-sort-item').removeClass("focused");
+                            jInput.parent().addClass("focused");
+                            return;
+                        }
+                    }
+
+                    var sItem = '<div class="combobox-sort-item focused"><input type="hidden" name="<?php echo $sortBoxName?>[]" value="' + value + '">' + text + '</div>';
+                    jSortBox.find('.combobox-sort-item').removeClass("focused");
+                    jSortBox.append(sItem);
+
+                    <?php endif; ?>
+                }
+
+                jSortBox.sortable();
+
+
+                jSortBox.on('click.sortBox1', function (e) {
+                    var jTarget = $(e.target);
+                    if (jTarget.hasClass('combobox-sort-item')) {
+                        jSortBox.find('.combobox-sort-item').removeClass("focused");
+                        jTarget.addClass("focused");
+                    }
+                });
+
+
+                jSortActionButtons.on('click.sortBox2', 'button', function (e) {
+                    var jFocused = jSortBox.find('.focused');
+                    if (jFocused.length) {
+
+                        var jTarget = $(e.target);
+                        if (jTarget.hasClass('move_up')) {
+                            var jPrev = jFocused.prev('.combobox-sort-item');
+                            if (jPrev.length) {
+                                jPrev.before(jFocused);
+                            }
+                        }
+                        else if (jTarget.hasClass('move_down')) {
+                            var jNext = jFocused.next('.combobox-sort-item');
+                            if (jNext.length) {
+                                jNext.after(jFocused);
+                            }
+                        }
+                        else if (jTarget.hasClass('remove')) {
+                            jFocused.remove();
+                        }
+                    }
+                });
+
+
+                $.widget("custom.combobox", {
+                    _create: function () {
+                        this.wrapper = $("<span>")
+                            .addClass("custom-combobox")
+                            .insertAfter(this.element);
+
+                        this.element.hide();
+                        this._createAutocomplete();
+                        this._createShowAllButton();
+                    },
+
+                    _createAutocomplete: function () {
+                        var selected = this.element.children(":selected"),
+                            value = selected.val() ? selected.text() : "";
+
+                        var zis = this;
+
+                        this.input = $("<input>")
+                            .appendTo(this.wrapper)
+                            .val(value)
+                            .attr("title", "")
+                            .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
+                            .autocomplete({
+                                delay: 0,
+                                minLength: 0,
+                                source: $.proxy(this, "_source")
+                            })
+                            .tooltip({
+                                classes: {
+                                    "ui-tooltip": "ui-state-highlight"
+                                }
+                            });
+
+                        this._on(this.input, {
+                            autocompleteselect: function (event, ui) {
+                                ui.item.option.selected = true;
+                                var value = ui.item.option.value;
+                                var text = ui.item.option.text;
+                                onComboBoxSelect(value, text);
+                            },
+
+                            autocompletechange: "_removeIfInvalid"
+                        });
+                    },
+
+                    _createShowAllButton: function () {
+                        var input = this.input,
+                            wasOpen = false;
+
+                        $("<a>")
+                            .attr("tabIndex", -1)
+                            // .attr("title", "Show All Items")
+                            // .tooltip()
+                            .appendTo(this.wrapper)
+                            .button({
+                                icons: {
+                                    primary: "ui-icon-triangle-1-s"
+                                },
+                                text: false
+                            })
+                            .removeClass("ui-corner-all")
+                            .addClass("custom-combobox-toggle ui-corner-right")
+                            .on("mousedown", function () {
+                                wasOpen = input.autocomplete("widget").is(":visible");
+                            })
+                            .on("click", function () {
+                                input.trigger("focus");
+
+                                // Close if already visible
+                                if (wasOpen) {
+                                    return;
+                                }
+
+                                // Pass empty string as value to search for, displaying all results
+                                input.autocomplete("search", "");
+                            });
+                    },
+
+                    _source: function (request, response) {
+                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                        response(this.element.children("option").map(function () {
+                            var text = $(this).text();
+                            if (this.value && (!request.term || matcher.test(text)))
+                                return {
+                                    label: text,
+                                    value: text,
+                                    option: this
+                                };
+                        }));
+                    },
+
+                    _removeIfInvalid: function (event, ui) {
+
+                        // Selected an item, nothing to do
+                        if (ui.item) {
+                            return;
+                        }
+
+                        // Search for a match (case-insensitive)
+                        var value = this.input.val(),
+                            valueLowerCase = value.toLowerCase(),
+                            valid = false;
+                        this.element.children("option").each(function () {
+                            if ($(this).text().toLowerCase() === valueLowerCase) {
+                                this.selected = valid = true;
+                                return false;
+                            }
+                        });
+
+                        // Found a match, nothing to do
+                        if (valid) {
+                            return;
+                        }
+
+                        // Remove invalid value
+                        this.input
+                            .val("")
+                            .attr("title", value + " didn't match any item")
+                            .tooltip("open");
+                        this.element.val("");
+                        this._delay(function () {
+                            this.input.tooltip("close").attr("title", "");
+                        }, 2500);
+                        this.input.autocomplete("instance").term = "";
+                    },
+
+                    _destroy: function () {
+                        this.wrapper.remove();
+                        this.element.show();
+                    }
+                });
+
+
+                jCombobox.combobox();
+
+            });
+
+
+        </script>
         <?php
 
     }
@@ -320,7 +676,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $cssId = StringTool::getUniqueCssId("f");
         $type = $model['type'];
 
-
+        $properties = (array_key_exists("properties", $model)) ? $model['properties'] : [];
         $inputType = "text";
         if (array_key_exists("inputType", $preferences)) {
             $inputType = $preferences['inputType'];
@@ -336,7 +692,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <?php endif; ?>
             </label>
 
-            <div class="col-md-6 col-sm-6 col-xs-12 soko-error-container
+            <div class="col-md-9 col-sm-9 col-xs-12 soko-error-container
 <?php if ($model['errors']): ?>
 <?php echo " soko-active"; ?>
     <?php endif; ?>
@@ -384,8 +740,6 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                             ?>
                             <!--                            <span class="fa fa-cloud-download form-control-feedback left" aria-hidden="true"></span>-->
                         </div>
-
-
                         <script>
                             jqueryComponent.ready(function () {
 
@@ -482,8 +836,28 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             </div>
         </div>
 
+        <?php echo $this->renderExtraLink($properties); ?>
 
         <?php
+    }
+
+
+
+
+    protected function renderFree(array $model, array $preferences = [])
+    {
+
+        $properties = $model['properties'];
+        $html = $properties['html'];
+        ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+            <div class="col-md-9 col-sm-9 col-xs-12">
+                <?php echo $html; ?>
+            </div>
+        </div>
+        <?php
+
     }
 
 
@@ -569,7 +943,23 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
     protected function displayInputWidget($model, $inputType, $cssId, $cssClass = null, $extra = null)
     {
+
+        $properties = (array_key_exists('properties', $model)) ? $model['properties'] : [];
+        $useLeftBox = false;
+        $leftBoxText = "";
+        $leftBoxIcon = "";
+        if (array_key_exists('leftBoxText', $properties)) {
+            $leftBoxText = $properties['leftBoxText'];
+            if (null === $cssClass) {
+                $cssClass = '';
+            }
+            $useLeftBox = true;
+            $cssClass .= 'form-control has-feedback-left';
+        }
+
+        $infoBox = (array_key_exists('info', $properties)) ? $properties['info'] : [];
         ?>
+
         <input
             <?php if ($this->isRequired($model)): ?>
                 required="required"
@@ -594,6 +984,29 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <?php echo $extra; ?>
             <?php endif; ?>
         >
+
+        <!--        <span class="fa fa-calendar-o form-control-feedback left"></span>-->
+        <?php if ($leftBoxText || $leftBoxIcon): ?>
+        <span class="<?php echo $leftBoxIcon; ?> form-control-feedback left left-box"><?php echo $leftBoxText; ?></span>
+    <?php endif; ?>
+        <div class="clearfix"></div>
+
+        <?php if ($infoBox):
+        if (!is_array($infoBox)) {
+            $infoBox = [
+                'type' => 'warning',
+                'text' => $infoBox,
+            ];
+        }
+        ?>
+        <div class="alert alert-<?php echo $infoBox['type']; ?> alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+            </button>
+            <?php echo $infoBox['text']; ?>
+        </div>
+    <?php endif; ?>
+
         <?php
     }
 
@@ -617,6 +1030,49 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 class="form-control col-md-7 col-xs-12"
         ><?php echo $model['value']; ?></textarea>
         <?php
+    }
+
+
+    protected function getExtraLink(array $extraLink)
+    {
+        return array_replace([
+            'color' => '#498dcb',
+            'link' => '#',
+            'icon' => null,
+            'isExternal' => true,
+            'text' => "just a link",
+
+        ], $extraLink);
+    }
+
+    protected function renderExtraLink(array $properties)
+    {
+        if (array_key_exists("extraLink", $properties)):
+            $extraLink = $this->getExtraLink($properties['extraLink']);
+            $external = $extraLink['isExternal'];
+            ?>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <a
+                        <?php if ($external): ?>
+                            target="_blank"
+                        <?php endif; ?>
+                            class="" style="white-space: nowrap; color: <?php echo $extraLink['color']; ?>"
+                            href="<?php echo htmlspecialchars($extraLink['link']); ?>">
+
+                        <?php if ($extraLink['icon']): ?>
+                            <i class="<?php echo $extraLink['icon']; ?>"></i>
+                        <?php endif; ?>
+
+                        <?php echo $extraLink['text']; ?>
+
+                        <?php if ($external): ?>
+                        <i class="fa fa-external-link"></i></a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif;
     }
 
 }
