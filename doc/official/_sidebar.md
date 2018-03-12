@@ -4,6 +4,9 @@
 * Services, Hooks, Config
   * [Hooks](hooks.md)
   
+* Développeur
+  * [Soko Cheatsheet](soko-cheatsheet.md)
+  
   
 * FAQ
   * [Les questions les plus fréquentes](faq.md)

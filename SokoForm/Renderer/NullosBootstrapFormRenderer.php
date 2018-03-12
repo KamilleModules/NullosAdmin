@@ -8,6 +8,8 @@ use Bat\StringTool;
 use Core\Services\A;
 use Core\Services\Hooks;
 use Module\Ekom\Utils\E;
+use Module\NullosAdmin\Helper\ConfigHelperInterface;
+use Module\NullosAdmin\Helper\TrumbowygConfigHelper;
 use SokoForm\Form\SokoFormInterface;
 use SokoForm\Renderer\SokoFormRenderer;
 use Theme\NullosTheme;
@@ -60,16 +62,40 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <?php echo $description; ?>
             <?php endif; ?>
 
+
             <?php
             $name = $form->getName();
-            foreach ($controlNames as $col): ?>
-                <?php if ($name !== $col): ?>
-                    <?php $r->render($col); ?>
-                <?php endif; ?>
-            <?php endforeach; ?>
 
 
-            <?php $r->submitKey(); ?>
+            $groups = $form->getGroups();
+            if (empty($groups)) {
+                foreach ($controlNames as $col) {
+                    if ($name !== $col) {
+                        $r->render($col);
+                    }
+                }
+            } else {
+
+                foreach ($groups as $group) {
+                    $label = $group['label'];
+                    $controls = $group['controls'];
+                    ?>
+                    <fieldset>
+                        <legend><?php echo $label; ?></legend><?php
+                        foreach ($controls as $col) {
+                            if ($name !== $col) {
+                                $r->render($col);
+                            }
+                        }
+                        ?></fieldset>
+                    <?php
+                }
+            }
+
+
+            $r->submitKey();
+
+            ?>
             <?php $r->submitButton($submitBtnPreferences); ?>
         </form>
 
@@ -430,7 +456,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         class="form-control combobox-sortbox">
                     <?php foreach ($sortBoxValues as $value => $label): ?>
                         <div class="combobox-sort-item"><input type="hidden" name="<?php echo $sortBoxName ?>[]"
-                                                                       value="<?php echo $value; ?>"><?php echo $label; ?>
+                                                               value="<?php echo $value; ?>"><?php echo $label; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -842,20 +868,31 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     }
 
 
-
-
     protected function renderFree(array $model, array $preferences = [])
     {
 
         $properties = $model['properties'];
         $html = $properties['html'];
+        $belowLabel = (array_key_exists("belowLabel", $properties) && true === $properties['belowLabel']) ? true : false;
         ?>
+
+        <?php if (true === $belowLabel): ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+        </div>
+        <div class="form-group">
+            <?php echo $html; ?>
+        </div>
+    <?php else: ?>
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
             <div class="col-md-9 col-sm-9 col-xs-12">
                 <?php echo $html; ?>
             </div>
         </div>
+    <?php endif; ?>
+
+
         <?php
 
     }
@@ -880,9 +917,6 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         </div>
         <?php
     }
-
-
-
 
 
     //--------------------------------------------
@@ -945,6 +979,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     {
 
         $properties = (array_key_exists('properties', $model)) ? $model['properties'] : [];
+
+        $placeHolder = array_key_exists("placeholder", $model) ? $model['placeholder'] : null;
+
         $useLeftBox = false;
         $leftBoxText = "";
         $leftBoxIcon = "";
@@ -969,6 +1006,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <?php endif; ?>
             <?php if ($this->isReadOnly($model)): ?>
                 readonly
+            <?php endif; ?>
+            <?php if ($placeHolder): ?>
+                placeholder="<?php echo htmlspecialchars($placeHolder); ?>"
             <?php endif; ?>
                 type="<?php echo $inputType; ?>"
 
@@ -1013,7 +1053,27 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
     protected function displayTextareaWidget($model, $inputType, $cssId)
     {
+
+        $properties = $model['properties'];
+        $wysiwyg = (array_key_exists('wysiwyg', $properties)) ? $properties['wysiwyg'] : false;
+
+
         ?>
+
+        <?php if ($wysiwyg): ?>
+        <div class="alert alert-info alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+            </button>
+            Conseils pour utiliser l'éditeur ci-dessous:
+            <ul>
+                <li>Pour faire des retours à la ligne, utilisez SHIFT+RETURN</li>
+                <li>Pour créer un nouveau paragraphe, utilisez RETURN</li>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+
         <textarea
             <?php if ($this->isRequired($model)): ?>
                 required="required"
@@ -1027,8 +1087,48 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 type="<?php echo $inputType; ?>"
                 name="<?php echo htmlspecialchars($model['name']); ?>"
                 id="<?php echo $cssId; ?>"
-                class="form-control col-md-7 col-xs-12"
+                class="form-control col-md-7 col-xs-12 an-editor-wrapper"
         ><?php echo $model['value']; ?></textarea>
+
+
+        <?php if (true === $wysiwyg):
+        $wysiwygConfig = [];
+        if (array_key_exists("wysiwygConfig", $properties)) {
+            $config = $properties['wysiwygConfig'];
+            if ($config instanceof ConfigHelperInterface) {
+                $wysiwygConfig = $config->getConfig();
+            }
+        } else {
+            $wysiwygConfig = TrumbowygConfigHelper::create()->prepareByPreset("minimal")->getConfig();
+        }
+
+        $hasEmoji = TrumbowygConfigHelper::has("emoji", $wysiwygConfig);
+
+        ?>
+
+        <script>
+            jqueryComponent.ready(function () {
+
+                <?php if(true === $hasEmoji): ?>
+                emojify.setConfig({
+                    img_dir: '//cdnjs.cloudflare.com/ajax/libs/emojify.js/1.1.0/images/basic/'
+                });
+                <?php endif; ?>
+
+                $('#<?php echo $cssId; ?>').trumbowyg(<?php echo json_encode($wysiwygConfig); ?>);
+
+
+                <?php if(true === $hasEmoji): ?>
+                emojify.run();
+                $('.trumbowyg-editor').on('input propertychange', function () {
+                    emojify.run();
+                });
+                <?php endif; ?>
+
+
+            });
+        </script>
+    <?php endif; ?>
         <?php
     }
 
