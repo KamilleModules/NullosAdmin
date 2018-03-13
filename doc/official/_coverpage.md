@@ -12,4 +12,4 @@
 [Get Started](#NullosAdmin)
 
 
-![color](rgb(215, 227, 230))
+![color](rgb(243, 243, 243))

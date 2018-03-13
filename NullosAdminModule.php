@@ -20,6 +20,7 @@ class NullosAdminModule extends KamilleModule
     {
         return [
             'ling.DirScanner',
+            'ling.Ecp',
             'ling.Kamille',
             'ling.Models',
             'ling.ModelRenderers',

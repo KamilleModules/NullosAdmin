@@ -6,7 +6,8 @@ NullosAdmin
 
 NullosAdmin est un système qui permet d'administrer n'importe quelle application.
 
-
+NullosAdmin est un module du [framework Kamille](https://github.com/lingtalfi/Kamille).
+Avant de commencer, assurez-vous que vous comprenez bien le fonctionnement du framework Kamille.
 
 
 Vue d'ensemble
