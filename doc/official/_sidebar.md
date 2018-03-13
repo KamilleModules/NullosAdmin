@@ -8,6 +8,7 @@
 * Développeur
   * [Soko Cheatsheet](soko-cheatsheet.md)
   * [Contrôleurs d'exemple](controller-example.md)
+  * [Morphic tips](morphic-tips.md)
   
   
 * FAQ

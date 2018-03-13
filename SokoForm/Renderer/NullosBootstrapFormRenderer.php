@@ -31,11 +31,13 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
         $options = array_replace([
             "description" => null,
+            "isFakeForm" => false,
             "submitBtnLabel" => "Submit",
         ], $options);
         $submitBtnPreferences = [
             "label" => $options['submitBtnLabel'],
         ];
+        $isFakeForm = $options['isFakeForm'];
         $description = $options['description'];
 
 
@@ -48,56 +50,62 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         ?>
 
 
+        <?php if (false === $isFakeForm): ?>
         <form <?php $r->formAttributes(); ?>
-            <?php if ($cssId): ?>
-                id="<?php echo $cssId; ?>"
-            <?php endif; ?>
-                data-parsley-validate=""
-                class="form-horizontal form-label-left soko-form"
-                novalidate=""
+        <?php if ($cssId): ?>
+            id="<?php echo $cssId; ?>"
+        <?php endif; ?>
+        data-parsley-validate=""
+        class="form-horizontal form-label-left soko-form"
+        novalidate=""
         >
-            <?php $r->notifications(); ?>
-
-            <?php if (null !== $description): ?>
-                <?php echo $description; ?>
-            <?php endif; ?>
+        <?php $r->notifications(); ?>
+    <?php endif; ?>
 
 
-            <?php
-            $name = $form->getName();
+        <?php if (null !== $description): ?>
+        <?php echo $description; ?>
+    <?php endif; ?>
 
 
-            $groups = $form->getGroups();
-            if (empty($groups)) {
-                foreach ($controlNames as $col) {
-                    if ($name !== $col) {
-                        $r->render($col);
-                    }
-                }
-            } else {
+        <?php
+        $name = $form->getName();
 
-                foreach ($groups as $group) {
-                    $label = $group['label'];
-                    $controls = $group['controls'];
-                    ?>
-                    <fieldset>
-                        <legend><?php echo $label; ?></legend><?php
-                        foreach ($controls as $col) {
-                            if ($name !== $col) {
-                                $r->render($col);
-                            }
-                        }
-                        ?></fieldset>
-                    <?php
+
+        $groups = $form->getGroups();
+        if (empty($groups)) {
+            foreach ($controlNames as $col) {
+                if ($name !== $col) {
+                    $r->render($col);
                 }
             }
+        } else {
+
+            foreach ($groups as $group) {
+                $label = $group['label'];
+                $controls = $group['controls'];
+                ?>
+                <fieldset>
+                    <legend><?php echo $label; ?></legend><?php
+                    foreach ($controls as $col) {
+                        if ($name !== $col) {
+                            $r->render($col);
+                        }
+                    }
+                    ?></fieldset>
+                <?php
+            }
+        }
 
 
-            $r->submitKey();
+        $r->submitKey();
 
-            ?>
-            <?php $r->submitButton($submitBtnPreferences); ?>
+        ?>
+
+        <?php if (false === $isFakeForm): ?>
+        <?php $r->submitButton($submitBtnPreferences); ?>
         </form>
+    <?php endif; ?>
 
         <?php
     }
