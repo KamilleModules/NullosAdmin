@@ -36,6 +36,18 @@ Input
 )
 ```
 
+###### Placer un mini-texte à gauche du input, en décoration
+
+```php
+->addControl(SokoInputControl::create()
+    ->setName("meta_title")
+    ->setLabel("Balise titre")
+    ->setProperties([
+        'leftBoxText' => 70,
+    ])
+)
+```
+
 
 
 Textarea
