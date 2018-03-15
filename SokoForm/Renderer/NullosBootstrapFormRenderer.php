@@ -262,16 +262,19 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 ?>
                 <script>
                     jqueryComponent.ready(function () {
+
                         var jComponent = $("#<?php echo $cssId; ?>");
                         var jForm = jComponent.closest('form');
                         var jTarget = jForm.find('select[name="<?php echo $listenTo; ?>"]');
-                        var api = ekomApi.inst();
+
+
+                        var api = nullosApi.inst();
                         jTarget
                             .off('change.nullosReactive')
                             .on('change.nullosReactive', function () {
                                 var value = $(this).val();
-                                api.utils.request("<?php echo $service; ?>", {
-                                    feature_id: value
+                                api.request("<?php echo $service; ?>", {
+                                    parentIdentifier: value
                                 }, function (r) {
                                     /**
                                      * make the potential error message disappear (if using soko),
@@ -287,6 +290,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
                                 });
                             });
+
+                        // trigger at init for free (let the child initialize itself...)
+                        jTarget.trigger('change');
                     });
                 </script>
 
@@ -378,6 +384,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
          * if useSortBox, it's an array of values
          */
         $comboboxValue = $model['value'];
+        if (!is_array($comboboxValue)) {
+            $comboboxValue = [];
+        }
 
         ?>
 
@@ -446,7 +455,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
             </div>
         </div>
-
+        <?php echo $this->renderExtraLink($properties); ?>
 
         <?php if (true === $useSortBox):
         $sortBoxValues = [];

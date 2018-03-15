@@ -143,6 +143,46 @@ $choice_product_types = QuickPdo::fetchAll("select id, concat(id, \". \", name) 
 ```
 
 
+###### Afficher un lien supplémentaire
+
+```php
+->addControl(SokoChoiceControl::create()
+    ->setName("product_type_id")
+    ->setLabel("Type de produit")
+    ->setChoices($choice_product_type_id)
+    ->setProperties([
+        'readonly' => (null !== $product_id),
+        'extraLink' => [
+            'text' => 'Créer un nouvel élément "Product id"',
+            'icon' => 'fa fa-plus',
+            'link' => A::link('Ekom_Back_Generated_EkProduct_List') . '?form',
+        ],
+    ])
+)
+```
+
+
+###### Réagir par rapport à un autre élément
+
+
+Ce méchanisme est l'implémentation du système [**reactive**](divers/reactive-system.md) (pour plus d'infos voir ce fichier `class-modules/Ekom/doc/backoffice/backoffice-brainstorm.md`),
+qui permet en gros à un select enfant de modifier automatiquement son état en fonction du changement
+d'un select parent.
+
+
+```php
+->addControl(SokoChoiceControl::create()
+    ->setName("product_type_id")
+    ->setLabel("Type de produit")
+    ->setChoices($choice_product_type_id)
+    ->setProperties([
+        "listenTo" => "product_attribute_id",
+        "service" => "Ekom:back.reactive.product_attribute_value", // la syntaxe est: <moduleName> <:> <serviceIdentifier>
+    ])
+)
+```
+
+
 
 Auto-complete
 -----------------
@@ -169,7 +209,7 @@ Auto-complete
         'extraLink' => [
             'text' => 'Créer un nouvel élément "Product id"',
             'icon' => 'fa fa-plus',
-            'link' => E::link('Ekom_Back_Generated_EkProduct_List') . '?form',
+            'link' => A::link('Ekom_Back_Generated_EkProduct_List') . '?form',
         ],
     ])
     ->setValue($product_id)
@@ -203,6 +243,25 @@ ComboBox avec choix de l'ordre des éléments
     ->setChoices($choices_product_attributes)
     ->setProperties([
         "useSortBox" => true,
+    ])
+    ->addEmptyChoiceAtBeginning()
+)
+```
+
+###### Ajouter un lien supplémentaire
+
+```php
+->addControl(SokoComboBoxControl::create()
+    ->setName("product_attribute")
+    ->setLabel("Attributs")
+    ->setChoices($choices_product_attributes)
+    ->setProperties([
+        "useSortBox" => true,
+        'extraLink' => [
+            'text' => 'Créer un nouvel élément "Product id"',
+            'icon' => 'fa fa-plus',
+            'link' => A::link('Ekom_Back_Generated_EkProduct_List') . '?form',
+        ],
     ])
     ->addEmptyChoiceAtBeginning()
 )
