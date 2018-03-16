@@ -266,3 +266,48 @@ ComboBox avec choix de l'ordre des éléments
     ->addEmptyChoiceAtBeginning()
 )
 ```
+
+
+
+Arbre
+-----------------
+
+Le tableau $categories doit comporter des éléments dont la structure est la suivante:
+
+- id
+- label
+- children: (récursif)
+
+$expandedCats correspond à un tableau d'id de catégories à ouvrir au démarrage de l'arbre.
+
+
+```php
+->addControl(NullosSokoFancyTreeControl::create()
+    ->setName("categories")
+    ->setLabel("Catégories")
+    ->setCategories($categories)
+    ->setExpanded($expandedCats)
+)
+```
+
+
+
+Dropzone
+-----------------
+
+###### Dropzone pour une image simple
+
+
+```php
+->addControl(SokoSafeUploadControl::create()
+    ->setName("url")
+    ->setLabel('Url')
+    ->setProfileId("cardImage")
+    ->setRic($ric)
+    ->setPayloadVar("product_card_id", $product_card_id)
+    ->setProperties([
+        'required' => false,
+    ])
+)
+```
+

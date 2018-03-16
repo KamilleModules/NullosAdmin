@@ -175,7 +175,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     protected function renderFileSafeUpload(array $model, array $preferences = [])
     {
 
-        $cssId = StringTool::getUniqueCssId("select-");
+        $cssId = StringTool::getUniqueCssId("input-");
+        $cssId2 = StringTool::getUniqueCssId("input2-");
+        $cssId3 = StringTool::getUniqueCssId("drop-");
         $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
         $readOnly = (array_key_exists("readonly", $properties) && (true === $properties['readonly']));
         $sDisabled = "";
@@ -192,19 +194,71 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $payload = $model['payload'];
 
 
+        $fileType = "image";
+        $value = $model['value'];
+
+
+        $text = "Glissez vos fichiers ici";
+
+        $sStarted = "";
+        if (empty($value)) {
+            $sStarted = "not-started";
+        }
+
         ?>
-        <div class="form-group">
+        <div class="form-group nullos-dropzone-container <?php echo $sStarted; ?>">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
             <div class="col-md-9 col-sm-9 col-xs-12 form-group has-feedback <?php echo $sErrorClass; ?>">
-                <div class="dropzone"></div>
+                <input
+                        class="form-control col-md-7 col-xs-12"
+                        id="<?php echo $cssId2; ?>" type="text" name="<?php echo $model['name']; ?>"
+                        value="<?php echo htmlspecialchars($model['value']); ?>"/>
+
+
+                <div class="nullos-dropzone" id="<?php echo $cssId3; ?>">
+                    <?php if ($value): ?>
+                        <?php if ('image' === $fileType): ?>
+                            <img src="<?php echo htmlspecialchars($value); ?>" width="250"/>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+
+
+                <div class="dropzone" id="<?php echo $cssId; ?>"></div>
                 <script>
                     jqueryComponent.ready(function () {
-                        $(".dropzone").dropzone({
+
+
+                        var jNullosDropZone = $('#<?php echo $cssId3; ?>'); // I find it cleaner to have my own dropzone...
+                        var jInput = $('#<?php echo $cssId2; ?>');
+                        var jDropZone = $("#<?php echo $cssId; ?>");
+
+
+                        jDropZone.dropzone({
                             url: "<?php echo E::getEcpUri("upload_handler", [
                                 'profile_id' => $profileId,
                                 'payload' => $payload,
-                            ]); ?>"
+                            ]); ?>",
+                            maxFiles: null,
+                            dictDefaultMessage: "<?php echo $text; ?>"
                         });
+
+
+                        var myDropzone = Dropzone.forElement("#<?php echo $cssId; ?>");
+                        myDropzone
+                            .on("sending", function (file, response) {
+                                jNullosDropZone.closest(".nullos-dropzone-container").removeClass('not-started');
+                                jNullosDropZone.append('<img class="ajaxloader" src="/theme/nullosAdmin/images/ajax-loader.gif" />');
+                            })
+                            .on("success", function (file, response) {
+                                if (true === response.success) {
+                                    // myDropzone.removeAllFiles();
+                                    var url = response.url;
+                                    jNullosDropZone.empty().append('<img width="250" src="' + url + '" >');
+                                    jInput.val(url);
+                                }
+                            })
+                        ;
                     });
                 </script>
 
