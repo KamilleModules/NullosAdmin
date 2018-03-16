@@ -12,6 +12,7 @@ use Module\NullosAdmin\Helper\ConfigHelperInterface;
 use Module\NullosAdmin\Helper\TrumbowygConfigHelper;
 use SokoForm\Form\SokoFormInterface;
 use SokoForm\Renderer\SokoFormRenderer;
+use Theme\NullosAdmin\Ekom\Back\Category\CategoryFancyTreeRenderer;
 use Theme\NullosTheme;
 
 class NullosBootstrapFormRenderer extends SokoFormRenderer
@@ -136,6 +137,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             case "NullosSokoReactiveChoiceControl":
                 $type = $controlModel['type'];
                 $ret = "choice-$type";
+                break;
+            case "NullosSokoFancyTreeControl":
+                $ret = "fancy-tree";
                 break;
         }
         if ($ret) {
@@ -264,6 +268,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     jqueryComponent.ready(function () {
 
                         var jComponent = $("#<?php echo $cssId; ?>");
+                        var originalValue = jComponent.val();
+                        console.log(originalValue);
                         var jForm = jComponent.closest('form');
                         var jTarget = jForm.find('select[name="<?php echo $listenTo; ?>"]');
 
@@ -271,7 +277,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         var api = nullosApi.inst();
                         jTarget
                             .off('change.nullosReactive')
-                            .on('change.nullosReactive', function () {
+                            .on('change.nullosReactive', function (event, firstTrigger) {
+
                                 var value = $(this).val();
                                 api.request("<?php echo $service; ?>", {
                                     parentIdentifier: value
@@ -288,11 +295,16 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                         jComponent.append('<option value="' + k + '">' + v + '</option>');
                                     }
 
+
+                                    if ("firstTrigger" === firstTrigger) {
+                                        jComponent.val(originalValue);
+                                    }
+
                                 });
                             });
 
                         // trigger at init for free (let the child initialize itself...)
-                        jTarget.trigger('change');
+                        jTarget.trigger('change', 'firstTrigger');
                     });
                 </script>
 
@@ -346,6 +358,26 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                class="js-switch" <?php echo $sChecked; ?>/>
                     </label>
                 </div>
+            </div>
+        </div>
+        <?php
+
+    }
+
+    protected function renderFancyTree(array $model, array $preferences = [])
+    {
+        $categories = $model['categories'];
+        $expanded = array_key_exists("expanded", $model) ? $model['expanded'] : [];
+        ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+            <div class="col-md-9 col-sm-9 col-xs-12">
+                <?php
+                CategoryFancyTreeRenderer::create()
+                    ->setCategories($categories)
+                    ->setExpanded($expanded)
+                    ->display();
+                ?>
             </div>
         </div>
         <?php
