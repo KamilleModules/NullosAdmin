@@ -33,7 +33,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $options = array_replace([
             "description" => null,
             "isFakeForm" => false,
-            "submitBtnLabel" => "Submit",
+            "submitBtnLabel" => "Enregistrer",
         ], $options);
         $submitBtnPreferences = [
             "label" => $options['submitBtnLabel'],
@@ -228,6 +228,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <script>
                     jqueryComponent.ready(function () {
 
+                        var api = nullosApi.inst();
 
                         var jNullosDropZone = $('#<?php echo $cssId3; ?>'); // I find it cleaner to have my own dropzone...
                         var jInput = $('#<?php echo $cssId2; ?>');
@@ -248,6 +249,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         myDropzone
                             .on("sending", function (file, response) {
                                 jNullosDropZone.closest(".nullos-dropzone-container").removeClass('not-started');
+                                jNullosDropZone.find(".ajaxloader").remove();
                                 jNullosDropZone.append('<img class="ajaxloader" src="/theme/nullosAdmin/images/ajax-loader.gif" />');
                             })
                             .on("success", function (file, response) {
@@ -256,6 +258,17 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                     var url = response.url;
                                     jNullosDropZone.empty().append('<img width="250" src="' + url + '" >');
                                     jInput.val(url);
+                                }
+                                else {
+                                    if (response.errors) {
+                                        var sErr = response.errors.join("<br>");
+                                        api.notif({
+                                            title: "Des erreurs se sont produites",
+                                            text: sErr,
+                                            type: "error"
+                                        });
+                                        jNullosDropZone.find(".ajaxloader").remove();
+                                    }
                                 }
                             })
                         ;
@@ -1003,8 +1016,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
     public function submitButton(array $preferences = [])
     {
-        $label = $this->getPreference("label", $preferences, "Submit");
-        $labelUpdate = $this->getPreference("labelUpdate", $preferences, "Submit and update");
+        $label = $this->getPreference("label", $preferences, "Enregistrer");
+        $labelUpdate = $this->getPreference("labelUpdate", $preferences, "Enregistrer et continuer");
         $attributes = $this->getPreference("attributes", $preferences, []);
         unset($attributes['class']);
         ?>

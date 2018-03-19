@@ -13,6 +13,7 @@ Cette api est disponible partout au sein du thème `nullosAdmin`.
 Elle expose les méthodes suivantes:
 
 - confirm
+- notif
 - request
 - on
 - off
@@ -45,6 +46,43 @@ nullosApi.inst().confirm(confirmText, function () {
 ```
 
 
+ 
+notif
+------------
+
+
+Cette méthode permet d'afficher une notification flottant vers la partie haut-droite du site.
+
+
+
+Version minimale
+
+```js 
+nullosApi.inst().notif();
+```
+
+Version maximale:
+
+```js
+/**
+ * @param options
+ * - title: default=Hey!
+ * - text: string default=
+ * - icon: string default=
+ * - type: string (success, info, notice, error, dark) default=info
+ * - isDark: bool, default=false
+ */
+var api = nullosApi.inst();
+api.notif({
+    title: "ça va",
+    text: "hello",
+    type: "error",  
+    icon: "fa fa-plus"
+});
+
+```
+
+<img src="image/pnotify.png" alt="Drawing"/>
 
 
 request

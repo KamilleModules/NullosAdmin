@@ -47,7 +47,7 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
             jqueryComponent.ready(function () {
                 window.Morphic.onDeleteAfter = function () {
                     //window.location.href = "<?php echo $uri; ?>";
-                    window.location.reload();
+                    window.location.href = location.href;
                 };
             });
         </script>
