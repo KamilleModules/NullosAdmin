@@ -8,7 +8,7 @@ use Module\NullosAdmin\Exception\NullosException;
 
 class NullosMorphicHelper
 {
-    public static function getStandardColTransformer($name)
+    public static function getStandardColTransformer($name, array $options = [])
     {
         switch ($name) {
             case "active":
