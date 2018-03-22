@@ -4,6 +4,7 @@
 namespace Module\NullosAdmin\SokoForm\Renderer;
 
 
+use Bat\DebugTool;
 use Bat\StringTool;
 use Core\Services\A;
 use Core\Services\Hooks;
@@ -1172,7 +1173,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
         $properties = $model['properties'];
         $wysiwyg = (array_key_exists('wysiwyg', $properties)) ? $properties['wysiwyg'] : false;
-
+        $showSerializeOnly = $properties['showSerializeOnly'] ?? false;
 
         ?>
 
@@ -1189,6 +1190,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         </div>
     <?php endif; ?>
 
+        <?php if (true === $showSerializeOnly): ?>
+        <?php DebugTool::dump(unserialize($model['value'])); ?>
+        <input readonly type="hidden" name="<?php echo htmlspecialchars($model['name']); ?>"
+               value="<?php echo htmlspecialchars($model['value']); ?>">
+    <?php else: ?>
 
         <textarea
             <?php if ($this->isRequired($model)): ?>
@@ -1205,6 +1211,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 id="<?php echo $cssId; ?>"
                 class="form-control col-md-7 col-xs-12 an-editor-wrapper"
         ><?php echo $model['value']; ?></textarea>
+
+    <?php endif; ?>
 
 
         <?php if (true === $wysiwyg):

@@ -113,6 +113,20 @@ Textarea
 ```
 
 
+###### Display unserialized text only
+
+```php
+->addControl(SokoInputControl::create()
+    ->setName("info_messages")
+    ->setLabel("Info messages")
+    ->setType("textarea")
+    ->setProperties([
+        "showSerializeOnly" => true,
+    ])
+)
+```
+
+
 
 Liste
 -------------
