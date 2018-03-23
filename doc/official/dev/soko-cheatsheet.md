@@ -169,7 +169,7 @@ $choice_product_types = QuickPdo::fetchAll("select id, concat(id, \". \", name) 
         'extraLink' => [
             'text' => 'Créer un nouvel élément "Product id"',
             'icon' => 'fa fa-plus',
-            'link' => A::link('Ekom_Back_Generated_EkProduct_List') . '?form',
+            'link' => A::link('Ekom_Generated_EkProduct_List') . '?form',
         ],
     ])
 )
@@ -223,7 +223,7 @@ Auto-complete
         'extraLink' => [
             'text' => 'Créer un nouvel élément "Product id"',
             'icon' => 'fa fa-plus',
-            'link' => A::link('Ekom_Back_Generated_EkProduct_List') . '?form',
+            'link' => A::link('Ekom_Generated_EkProduct_List') . '?form',
         ],
     ])
     ->setValue($product_id)
@@ -274,7 +274,7 @@ ComboBox avec choix de l'ordre des éléments
         'extraLink' => [
             'text' => 'Créer un nouvel élément "Product id"',
             'icon' => 'fa fa-plus',
-            'link' => A::link('Ekom_Back_Generated_EkProduct_List') . '?form',
+            'link' => A::link('Ekom_Generated_EkProduct_List') . '?form',
         ],
     ])
     ->addEmptyChoiceAtBeginning()
