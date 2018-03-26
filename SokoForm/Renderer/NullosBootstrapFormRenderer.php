@@ -1110,39 +1110,57 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             $cssClass .= 'form-control has-feedback-left';
         }
 
+        $hasColorPicker = (array_key_exists("colorPicker", $properties) && true === $properties['colorPicker']);
+
+
         ?>
 
-        <input
-            <?php if ($this->isRequired($model)): ?>
-                required="required"
+        <?php if (true === $hasColorPicker): ?>
+        <div class="input-group colorpicker-element">
             <?php endif; ?>
-            <?php if ($this->isDisabled($model)): ?>
-                disabled
-            <?php endif; ?>
-            <?php if ($this->isReadOnly($model)): ?>
-                readonly
-            <?php endif; ?>
-            <?php if ($placeHolder): ?>
-                placeholder="<?php echo htmlspecialchars($placeHolder); ?>"
-            <?php endif; ?>
-                type="<?php echo $inputType; ?>"
 
-                name="<?php echo htmlspecialchars($model['name']); ?>"
-                value="<?php echo htmlspecialchars($model['value']); ?>"
-                id="<?php echo $cssId; ?>"
-            <?php if ($cssClass): ?>
-                class="<?php echo $cssClass; ?>"
-            <?php else: ?>
-                class="form-control col-md-7 col-xs-12"
-            <?php endif; ?>
-            <?php if ($extra): ?>
-                <?php echo $extra; ?>
-            <?php endif; ?>
-        >
+            <input
+                <?php if ($this->isRequired($model)): ?>
+                    required="required"
+                <?php endif; ?>
+                <?php if ($this->isDisabled($model)): ?>
+                    disabled
+                <?php endif; ?>
+                <?php if ($this->isReadOnly($model)): ?>
+                    readonly
+                <?php endif; ?>
+                <?php if ($placeHolder): ?>
+                    placeholder="<?php echo htmlspecialchars($placeHolder); ?>"
+                <?php endif; ?>
+                    type="<?php echo $inputType; ?>"
 
-        <!--        <span class="fa fa-calendar-o form-control-feedback left"></span>-->
-        <?php if ($leftBoxText || $leftBoxIcon): ?>
-        <span class="<?php echo $leftBoxIcon; ?> form-control-feedback left left-box"><?php echo $leftBoxText; ?></span>
+                    name="<?php echo htmlspecialchars($model['name']); ?>"
+                    value="<?php echo htmlspecialchars($model['value']); ?>"
+                    id="<?php echo $cssId; ?>"
+                <?php if ($cssClass): ?>
+                    class="<?php echo $cssClass; ?>"
+                <?php else: ?>
+                    class="form-control col-md-7 col-xs-12"
+                <?php endif; ?>
+                <?php if ($extra): ?>
+                    <?php echo $extra; ?>
+                <?php endif; ?>
+            >
+
+            <!--        <span class="fa fa-calendar-o form-control-feedback left"></span>-->
+            <?php if ($leftBoxText || $leftBoxIcon): ?>
+                <span class="<?php echo $leftBoxIcon; ?> form-control-feedback left left-box"><?php echo $leftBoxText; ?></span>
+            <?php endif; ?>
+
+
+            <?php if (true === $hasColorPicker): ?>
+            <span class="input-group-addon"><i style="background-color: rgb(0, 0, 0);"></i></span>
+        </div>
+        <script>
+            jqueryComponent.ready(function () {
+                $('#<?php echo $cssId; ?>').closest(".colorpicker-element").colorpicker();
+            });
+        </script>
     <?php endif; ?>
         <div class="clearfix"></div>
 
@@ -1151,6 +1169,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         if ($infoBox) {
             $this->printInfoBox($infoBox);
         }
+
     }
 
 

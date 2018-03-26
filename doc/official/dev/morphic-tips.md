@@ -18,6 +18,91 @@ Rajouter un icône actif/inacf dans une liste
 
 
 
+
+Transformer un code hexadécimal en couleur dans une liste
+---------------
+
+```php
+'colTransformers' => [
+    'color' => NullosMorphicHelper::getStandardColTransformer("color"),
+],
+```
+
+<img src="image/morphic-list-color.png" alt="Drawing"/>
+
+
+
+Tronquer un texte trop long dans une liste
+---------------
+
+```php
+'colTransformers' => [
+    'error_messages' => NullosMorphicHelper::getStandardColTransformer("toolong"),
+],
+```
+
+<img src="image/morphic-toolong.png" alt="Drawing"/>
+
+
+
+
+Désérialiser un texte sérialisé dans une liste
+---------------
+
+```php
+'colTransformers' => [
+    'shop_info' => NullosMorphicHelper::getStandardColTransformer("unserialize"),
+],
+```
+
+<img src="image/morphic-unserialize.png" alt="Drawing"/>
+
+
+Entourer le texte avec un oreiller de couleur dans une liste
+---------------
+
+```php
+'colTransformers' => [
+    'amount' => NullosMorphicHelper::getStandardColTransformer("pill"),
+],
+```
+
+Pour changer la couleur, utiliser l'option class, qui peut prendre une des valeurs suivantes:
+
+- default (gris)
+- primary (bleu foncé)
+- success (vert), valeur par défaut
+- info (bleu clair)
+- warning (orange)
+- danger (rouge)
+
+```php
+'colTransformers' => [
+    'amount' => NullosMorphicHelper::getStandardColTransformer("pill", ["class" => "success"]),
+],
+```
+
+<img src="image/morphic-pill.png" alt="Drawing"/>
+
+
+
+Whitespace: nowrap pour un élément de liste
+---------------
+
+```php
+'colTransformers' => [
+    'label' => NullosMorphicHelper::getStandardColTransformer("nowrap"),
+],
+```
+
+
+<img src="image/morphic-nowrap.png" alt="Drawing"/>
+
+
+
+
+
+
 Ajouter un filtre de type "liste de valeurs"
 ---------------
 

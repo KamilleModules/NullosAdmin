@@ -50,6 +50,20 @@ Input
 
 
 
+Input couleur
+-----------
+
+```php
+->addControl(SokoInputControl::create()
+    ->setName("color")
+    ->setLabel("Couleur")
+    ->setProperties([
+        "colorPicker" => true,
+    ])
+)
+```
+
+
 Textarea
 -----------
 

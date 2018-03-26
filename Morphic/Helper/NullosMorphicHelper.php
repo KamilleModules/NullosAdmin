@@ -43,6 +43,22 @@ class NullosMorphicHelper
                     return $s;
                 };
                 break;
+            case "color":
+                return function ($value, array $row) use ($options) {
+                    return '<div style="width:20px; height: 20px; border: 1px solid #e0e0e0; background-color: ' . $value . '">&nbsp;</div>';
+                };
+                break;
+            case "pill":
+                return function ($value, array $row) use ($options) {
+                    $class = $options['class'] ?? "success";
+                    return '<div class="label label-pill label-' . $class . '">' . $value . '</div>';
+                };
+                break;
+            case "nowrap":
+                return function ($value, array $row) {
+                    return '<span style="white-space: nowrap">' . $value . '</span>';
+                };
+                break;
             default:
                 throw new NullosException("Unknown col transformer with name $name");
                 break;
