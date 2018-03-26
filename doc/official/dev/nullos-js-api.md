@@ -19,6 +19,7 @@ Elle expose les méthodes suivantes:
 - off
 - once
 - trigger
+- debounce
 
  
 confirm
@@ -192,4 +193,30 @@ api.once("myEvent2", function () {
 });
 api.trigger("myEvent2"); // fire2
 api.trigger("myEvent2"); // rien ici
+```
+
+
+
+debounce
+----------
+
+Permet de réduire à 1 le nombre d'appels à un callback donné si ce callback est appelé
+plusieurs fois pendant une période définie.
+
+
+```js
+
+// code sans debounce (le callback est appelé à chaque fois que le clavier est touché)
+jSearch.on('keyup.gui', function () {
+    currentSearch = jSearch.val();
+    refresh();
+});
+
+
+// code avec debounce (le callback est appelé 1 seule fois par tranche de 250ms)
+jSearch.on('keyup.gui', nullosApi.inst().utils.debounce(function () {
+    currentSearch = jSearch.val();
+    refresh();
+}, 250));
+
 ```

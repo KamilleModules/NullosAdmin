@@ -12,13 +12,20 @@ class BreadcrumbsHelper
     public static function getBreadCrumbsModel(array $bcItems)
     {
         foreach ($bcItems as $k => $bcItem) {
+            if (is_string($bcItem)) {
+                $bcItem = [
+                    "label" => $bcItem,
+                ];
+            }
+
             if (false === array_key_exists("link", $bcItem)) {
                 if (array_key_exists("route", $bcItem)) {
-                    $bcItems[$k]['link'] = A::link($bcItem['route']);
+                    $bcItem['link'] = A::link($bcItem['route']);
                 } else {
-                    $bcItems[$k]['link'] = UriTool::uri(null, [], false);
+                    $bcItem['link'] = UriTool::uri(null, [], false);
                 }
             }
+            $bcItems[$k] = $bcItem;
         }
         return $bcItems;
     }

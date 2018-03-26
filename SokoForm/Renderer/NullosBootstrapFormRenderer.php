@@ -127,14 +127,6 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $ret = null;
         $className = $controlModel['class'];
         switch ($className) {
-            /**
-             * @todo-ling: this is a logic error,
-             * Ekom should not appear at the Nullos module level
-             */
-            case "EkomSokoDateControl":
-                $type = $controlModel['type'];
-                $ret = "input-$type";
-                break;
             case "NullosSokoReactiveChoiceControl":
                 $type = $controlModel['type'];
                 $ret = "choice-$type";
@@ -399,6 +391,12 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                    value="<?php echo htmlspecialchars($model['value']); ?>"
                             >
                         <?php endif; ?>
+                        <?php
+                        $infoBox = (array_key_exists('info', $properties)) ? $properties['info'] : [];
+                        if ($infoBox) {
+                            $this->printInfoBox($infoBox);
+                        }
+                        ?>
                         <?php $this->doRenderError($model, $preferences); ?>
                     </div>
                 </div>
@@ -550,6 +548,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                     value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
                         <?php endforeach; ?>
                     </select>
+
                 </div>
                 <?php $this->doRenderError($model, $preferences); ?>
 
@@ -1111,7 +1110,6 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             $cssClass .= 'form-control has-feedback-left';
         }
 
-        $infoBox = (array_key_exists('info', $properties)) ? $properties['info'] : [];
         ?>
 
         <input
@@ -1148,23 +1146,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     <?php endif; ?>
         <div class="clearfix"></div>
 
-        <?php if ($infoBox):
-        if (!is_array($infoBox)) {
-            $infoBox = [
-                'type' => 'warning',
-                'text' => $infoBox,
-            ];
-        }
-        ?>
-        <div class="alert alert-<?php echo $infoBox['type']; ?> alert-dismissible fade in" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                        aria-hidden="true">×</span>
-            </button>
-            <?php echo $infoBox['text']; ?>
-        </div>
-    <?php endif; ?>
-
         <?php
+        $infoBox = (array_key_exists('info', $properties)) ? $properties['info'] : [];
+        if ($infoBox) {
+            $this->printInfoBox($infoBox);
+        }
     }
 
 
@@ -1299,6 +1285,24 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         <?php endif;
     }
 
+
+    protected function printInfoBox($infoBox)
+    {
+        if (!is_array($infoBox)) {
+            $infoBox = [
+                'type' => 'warning',
+                'text' => $infoBox,
+            ];
+        }
+        ?>
+        <div class="alert alert-<?php echo $infoBox['type']; ?> alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+            </button>
+            <?php echo $infoBox['text']; ?>
+        </div>
+        <?php
+    }
 }
 
 

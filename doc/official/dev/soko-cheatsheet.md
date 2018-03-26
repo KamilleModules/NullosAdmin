@@ -76,7 +76,7 @@ Textarea
 )
 ```
 
-###### Wysiwyg with preset
+###### Wysiwyg avec presets
 
 ```php
 ->addControl(SokoInputControl::create()
@@ -92,7 +92,7 @@ Textarea
 ```
 
 
-###### Wysiwyg with upload
+###### Wysiwyg avec upload
 
 ```php
 ->addControl(SokoInputControl::create()
@@ -113,7 +113,7 @@ Textarea
 ```
 
 
-###### Display unserialized text only
+###### Afficher du texte serialisé
 
 ```php
 ->addControl(SokoInputControl::create()
@@ -152,6 +152,18 @@ $choice_product_types = QuickPdo::fetchAll("select id, concat(id, \". \", name) 
     ->setChoices($choice_product_type_id)
     ->setProperties([
         'readonly' => true,
+    ])
+)
+```
+###### Ajouter un texte informatif sous la liste
+
+```php
+->addControl(SokoChoiceControl::create()
+    ->setName("generator_mode")
+    ->setLabel("Mode")
+    ->setChoices($choice_generators)
+    ->setProperties([
+        'info' => "Some text...",
     ])
 )
 ```
