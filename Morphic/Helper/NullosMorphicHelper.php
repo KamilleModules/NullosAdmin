@@ -5,10 +5,29 @@ namespace Module\NullosAdmin\Morphic\Helper;
 
 
 use ArrayToString\ArrayToStringTool;
+use Core\Services\Hooks;
 use Module\NullosAdmin\Exception\NullosException;
 
 class NullosMorphicHelper
 {
+    public static function getStandardSearchList($name)
+    {
+        switch ($name) {
+            /**
+             * @todo-ling: should be localized?
+             */
+            case "active":
+                return [
+                    '1' => 'Oui',
+                    '0' => 'Non',
+                ];
+                break;
+            default:
+                throw new NullosException("Unknown search list with name $name");
+                break;
+        }
+    }
+
     public static function getStandardColTransformer($name, array $options = [])
     {
         switch ($name) {
@@ -59,8 +78,28 @@ class NullosMorphicHelper
                     return '<span style="white-space: nowrap">' . $value . '</span>';
                 };
                 break;
+            case "date":
+            case "datetime":
+                if ("date" === $name) {
+                    $forbidden = '0000-00-00';
+                } else {
+                    $forbidden = '0000-00-00 00:00:00';
+                }
+                return function ($value, array $row) use ($forbidden) {
+                    if ($value && $forbidden !== $value) {
+                        return '<span style="white-space: nowrap">' . $value . '</span>';
+                    }
+                };
+                break;
             default:
-                throw new NullosException("Unknown col transformer with name $name");
+                $func = null;
+                Hooks::call("NullosAdmin_MorphicHelper_StandardColTransformer", $func, $name, $options);
+
+                if (is_callable($func)) {
+                    return $func;
+                } else {
+                    throw new NullosException("Unknown col transformer with name $name");
+                }
                 break;
         }
     }

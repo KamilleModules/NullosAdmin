@@ -100,6 +100,22 @@ Whitespace: nowrap pour un élément de liste
 
 
 
+Des dates propres 
+---------------
+
+Ce transformateur filtre les dates "0000-00-00 00:00:00".
+
+```php
+'colTransformers' => [
+    'label' => NullosMorphicHelper::getStandardColTransformer("datetime"),
+],
+```
+
+
+
+
+
+
 
 
 
@@ -112,6 +128,14 @@ Ajouter un filtre de type "liste de valeurs"
         '1' => 'Oui',
         '0' => 'Non',
     ],
+],
+```
+
+Ou, plus standardisé:
+
+```php
+"searchColumnLists" => [
+    "new_client" => NullosMorphicHelper::getStandardSearchList("active"),
 ],
 ```
 
