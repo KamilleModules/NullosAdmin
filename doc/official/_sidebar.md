@@ -12,6 +12,7 @@
   * [Thème](dev/theme.md)
   * [Api Js Nullos](dev/nullos-js-api.md)
   * [NullosBaseController](dev/nullos-base-controller.md)
+  * [Widgets](dev/widgets.md)
   
 * Divers
   * [Système Reactive](divers/reactive-system.md)

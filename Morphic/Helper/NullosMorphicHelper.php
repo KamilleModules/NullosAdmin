@@ -10,6 +10,10 @@ use Module\NullosAdmin\Exception\NullosException;
 
 class NullosMorphicHelper
 {
+
+
+
+
     public static function getStandardSearchList($name)
     {
         switch ($name) {
@@ -27,6 +31,21 @@ class NullosMorphicHelper
                 break;
         }
     }
+
+    public static function getStandardIcon($type)
+    {
+        switch ($type) {
+            case "check":
+                return '<i style="color: #02c302" class="fa fa-check"></i>';
+                break;
+            case "remove":
+                return '<i style="color: #c30118" class="fa fa-remove"></i>';
+                break;
+            default:
+                break;
+        }
+    }
+
 
     public static function getStandardColTransformer($name, array $options = [])
     {
