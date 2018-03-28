@@ -17,6 +17,20 @@ Rajouter un icône actif/inacf dans une liste
 <img src="image/morphic-active-inactive.png" alt="Drawing"/>
 
 
+Transformer une url en image
+---------------
+
+```php
+'colTransformers' => [
+    'photo' => NullosMorphicHelper::getStandardColTransformer("image"),
+    'photo2' => NullosMorphicHelper::getStandardColTransformer("image", ['width' => 120]),
+],
+```
+
+
+<img src="image/morphic-image.png" alt="Drawing"/>
+
+
 
 
 Transformer un code hexadécimal en couleur dans une liste
@@ -103,7 +117,7 @@ Whitespace: nowrap pour un élément de liste
 Des dates propres 
 ---------------
 
-Ce transformateur filtre les dates "0000-00-00 00:00:00".
+Ce transformateur filtre les dates `"0000-00-00 00:00:00"`.
 
 ```php
 'colTransformers' => [

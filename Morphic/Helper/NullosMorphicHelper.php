@@ -12,8 +12,6 @@ class NullosMorphicHelper
 {
 
 
-
-
     public static function getStandardSearchList($name)
     {
         switch ($name) {
@@ -108,6 +106,12 @@ class NullosMorphicHelper
                     if ($value && $forbidden !== $value) {
                         return '<span style="white-space: nowrap">' . $value . '</span>';
                     }
+                };
+                break;
+            case "image":
+                $width = $options['width'] ?? 80;
+                return function ($value, array $row) use ($width) {
+                    return '<img src="' . $value . '" alt="image" width="' . $width . '">';
                 };
                 break;
             default:
