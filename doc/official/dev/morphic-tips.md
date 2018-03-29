@@ -126,6 +126,39 @@ Ce transformateur filtre les dates `"0000-00-00 00:00:00"`.
 ```
 
 
+Transformer une note en système d'étoiles 
+---------------
+
+
+
+```php
+'colTransformers' => [
+    'rating' => NullosMorphicHelper::getStandardColTransformer("rating"),
+    'rating' => NullosMorphicHelper::getStandardColTransformer("rating", [
+        'maxValue' => 100, 
+        'maxNbStars' => 5, 
+        'class' => "nullos-morphic-rating",  
+    ]),
+],
+```
+
+<img src="image/morphic-rating.png" alt="Drawing"/>
+
+
+
+Ajouter un menu dropdown 
+---------------
+
+
+
+```php
+'colTransformers' => [
+    'dropdown' => NullosMorphicHelper::getStandardColTransformer("rating"),
+],
+```
+
+<img src="image/morphic-rating.png" alt="Drawing"/>
+
 
 
 

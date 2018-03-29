@@ -110,8 +110,135 @@ class NullosMorphicHelper
                 break;
             case "image":
                 $width = $options['width'] ?? 80;
-                return function ($value, array $row) use ($width) {
-                    return '<img src="' . $value . '" alt="image" width="' . $width . '">';
+                $title = $options['title'] ?? null;
+                return function ($value, array $row) use ($width, $title) {
+
+                    $s = '<img src="' . $value . '" alt="image" width="' . $width . '"';
+                    if ($title) {
+                        if (is_callable($title)) {
+                            $title = call_user_func($title, $row);
+                        }
+                        $s .= ' title="' . htmlspecialchars($title) . '"';
+                    }
+                    $s .= '>';
+                    return $s;
+                };
+                break;
+            case "rating":
+                $maxValue = $options['maxValue'] ?? 100; // percent by default
+                $maxNbStars = $options['maxNbStars'] ?? 5; // 5 stars max by default
+                $class = $options['class'] ?? 'nullos-morphic-rating'; // 5 stars max by default
+
+                // doing some preparation work now...
+                if ($maxValue < $maxNbStars) {
+                    throw new \LogicException("The maxValue ($maxValue) cannot be less than the maxNbStars ($maxNbStars)");
+                }
+                $step = $maxValue / $maxNbStars; // try to make this number without decimals when you define the params... (because I don't handle them)
+                $halfStep = $step / 2;
+
+
+                return function ($value, array $row) use ($halfStep, $maxNbStars, $class) {
+
+                    $nbHalfSteps = ceil($value / $halfStep);
+
+                    $nbSteps = $nbHalfSteps / 2;
+                    $extraHalfStep = (($nbHalfSteps % 2) === 1);
+                    $s = '<div style="white-space: nowrap" class="' . $class . '">';
+                    $extraDone = false;
+                    for ($i = 1; $i <= $maxNbStars; $i++) {
+                        if ($i <= $nbSteps) {
+
+                            $s .= <<<EEE
+<span class="fa fa-star"></span>
+EEE;
+                        } else {
+                            if (true === $extraHalfStep && false === $extraDone) {
+                                $extraDone = true;
+                                $s .= <<<EEE
+<span class="fa fa-star-half-o"></span>
+EEE;
+                            } else {
+
+                                $s .= <<<EEE
+<span class="fa fa-star-o"></span>
+EEE;
+                            }
+                        }
+                    }
+                    $s .= '</div>';
+                    return $s;
+                };
+                break;
+            case "dropdown":
+                $callback = $options['callback'] ?? null;
+                if (null === $callback) {
+                    $callback = function ($value, $row) {
+                        return [
+                            "label" => "Actions",
+                            "openingSide" => "left", // left|right
+                            "items" => [
+                                [
+                                    "label" => "Action1",
+                                    "link" => "#",
+                                ],
+                                [
+
+                                    "label" => "Action2",
+                                    "link" => "#",
+                                ],
+                                [
+                                    "label" => "Action3",
+                                    "link" => "#",
+                                ],
+                            ],
+                        ];
+
+                    };
+                }
+
+
+                return function ($value, array $row) use ($callback) {
+
+
+                    $config = call_user_func($callback, $value, $row);
+
+                    $label = $config['label'] ?? "Action";
+                    $openingSide = $config['openingSide'] ?? "right";
+                    $class = '';
+                    if ('left' === $openingSide) {
+                        $class = 'dropdown-menu-right';
+                    }
+                    $items = $config['items'] ?? [];
+                    $sLinks = "";
+                    foreach ($items as $item) {
+                        $link = htmlspecialchars($item['link']);
+                        $sLinks .= <<<EEE
+<li><a href="$link">$item[label]</a></li>
+EEE;
+
+                        $sLinks .= PHP_EOL;
+                    }
+
+
+                    return <<<EEE
+<div class="dropdown">
+  <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    $label
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu $class">
+    $sLinks
+  </ul>
+</div>
+EEE;
+
+
+//                    $link = sprintf($linkFmt, $row['product_type_id'], $row['card_id'], $row['product_id']);
+                    $link = "#";
+                    return <<<EEE
+<a href="$link" class="btn btn-default btn-xs">Voir le produit</a>
+EEE;
+
                 };
                 break;
             default:

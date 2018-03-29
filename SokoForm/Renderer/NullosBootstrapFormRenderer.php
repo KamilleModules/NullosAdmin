@@ -1179,7 +1179,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $properties = $model['properties'];
         $wysiwyg = (array_key_exists('wysiwyg', $properties)) ? $properties['wysiwyg'] : false;
         $showSerializeOnly = $properties['showSerializeOnly'] ?? false;
-
+        $rows = $properties['rows'] ?? null;
         ?>
 
         <?php if ($wysiwyg): ?>
@@ -1210,6 +1210,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <?php endif; ?>
             <?php if ($this->isReadOnly($model)): ?>
                 readonly
+            <?php endif; ?>
+            <?php if ($rows): ?>
+                rows="<?php echo $rows; ?>"
             <?php endif; ?>
                 type="<?php echo $inputType; ?>"
                 name="<?php echo htmlspecialchars($model['name']); ?>"
