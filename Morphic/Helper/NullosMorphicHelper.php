@@ -5,6 +5,7 @@ namespace Module\NullosAdmin\Morphic\Helper;
 
 
 use ArrayToString\ArrayToStringTool;
+use Bat\StringTool;
 use Core\Services\Hooks;
 use Module\NullosAdmin\Exception\NullosException;
 
@@ -212,8 +213,21 @@ EEE;
                     $sLinks = "";
                     foreach ($items as $item) {
                         $link = htmlspecialchars($item['link']);
+                        $attributes = $item['attributes'] ?? [];
+                        $classes = $item['class'] ?? [];
+                        if (!is_array($classes)) {
+                            $classes = [$classes];
+                        }
+
+                        $sClasses = implode(' ', $classes);
+                        $sAttr = '';
+                        if($attributes){
+                            $sAttr = StringTool::htmlAttributes($attributes);
+                        }
+
+
                         $sLinks .= <<<EEE
-<li><a href="$link">$item[label]</a></li>
+<li><a class="$sClasses" $sAttr href="$link">$item[label]</a></li>
 EEE;
 
                         $sLinks .= PHP_EOL;

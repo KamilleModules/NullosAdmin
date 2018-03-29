@@ -152,12 +152,50 @@ Ajouter un menu dropdown
 
 
 ```php
+
+
+$productLinkFmt = A::link("Ekom_Catalog_Product_Form") . "?form=1&t=products&t2=product&product_type=%s&id=%s&product_id=%s";
+$commentLinkFmt = A::link("Ekom_Catalog_ProductCommentList") . "?form&id=%s";       
+        
+        
 'colTransformers' => [
-    'dropdown' => NullosMorphicHelper::getStandardColTransformer("rating"),
+    'action' => NullosMorphicHelper::getStandardColTransformer("dropdown", [
+        'callback' => function ($value, array $row) use ($productLinkFmt, $commentLinkFmt) {
+
+            $isActive = (bool)$row['active'];
+            $word = (true === $isActive) ? "invisible" : "visible";
+
+            return [
+                "label" => "Actions",
+                "openingSide" => "left", // left|right
+                "items" => [
+                    [
+                        "label" => "Rendre $word sur le site",
+                        "link" => "#",
+                        "class" => "bionic-btn",
+                        "attributes" => [
+                            "data-action" => "ecp:Ekom:back.updateProductCommentActive",
+                            "data-param-id" => $row['id'],
+                            "data-param-is_active" => (int)!$isActive,
+                            "data-directive-reload" => 1,
+                        ],
+                    ],
+                    [
+                        "label" => "Modifier le produit",
+                        "link" => sprintf($productLinkFmt, $row['product_type_id'], $row['product_id'], $row['card_id']),
+                    ],
+                    [
+                        "label" => "Modifier le commentaire",
+                        "link" => sprintf($commentLinkFmt, $row['id']),
+                    ],
+                ],
+            ];
+        }
+    ]),
 ],
 ```
 
-<img src="image/morphic-rating.png" alt="Drawing"/>
+<img src="image/morphic-dropdown.png" alt="Drawing"/>
 
 
 
