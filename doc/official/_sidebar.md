@@ -13,6 +13,7 @@
   * [Api Js Nullos](dev/nullos-js-api.md)
   * [Api Bionic Nullos](dev/nullos-bionic-api.md)
   * [NullosBaseController](dev/nullos-base-controller.md)
+  * [NullosStandardPageController](dev/nullos-standard-page-controller.md)
   * [Widgets](dev/widgets.md)
   
 * Divers
