@@ -55,11 +55,6 @@ class NullosAdminHooks
 
 
 
-    protected static function NullosAdmin_layout_topNotifications(array &$topNotifications)
-    {
-
-    }
-
 
     protected static function NullosAdmin_prepareHomePageClaws(\Kamille\Utils\Claws\ClawsInterface $claws)
     {

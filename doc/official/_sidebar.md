@@ -1,7 +1,8 @@
 * Tutoriels
   * [Créer un backoffice simple](tutoriel-creation-bo.md)
   * [Morphic liste: hello world](tutoriel-liste-morphic.md)
-  
+  * [FormList avec morphic](tutoriel-formlist-morphic.md)
+
 * Services, Hooks, Config
   * [Hooks](hooks.md)
   

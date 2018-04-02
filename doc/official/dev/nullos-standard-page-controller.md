@@ -15,6 +15,7 @@ Pour créer une page standard rapidement, vous pouvez utiliser le contrôleur `N
 qui propose les méthodes suivantes:
 
 - [pageTop](#pagetop)
+- [noPageTop](#nopagetop)
 - [errorTemplate](#errortemplate)
 
 
@@ -49,6 +50,16 @@ L'objet DropDown a lui-même les méthodes suivantes:
 - `setLabel`: définit le label                    
 - `setIcon`: définit un icône à utiliser pour cet élément de dropdown                     
 - `addButton`: ajoute un bouton au menu dropdown                    
+
+
+
+noPageTop
+----------
+
+noPageTop est une méthode qui supprime le pageTop.
+Cette méthode peut être utile dans le où vous codez une gui "from scratch", et vous n'avez pas la nécessité d'utiliser 
+le widget pageTop.
+
 
 
 
