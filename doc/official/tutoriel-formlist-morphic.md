@@ -244,7 +244,10 @@ Il y a deux choses importantes à noter ici:
     Les fichiers correspondant aux identifiants indiqués sont préfixé de: `config/$ModuleName`
 
 
-###### Copie des fichiers de configuration liste et formulaire.
+Etape 2: rappatrier les fichiers générés dans le dossier de notre module
+-----------------------
+
+
 
 Copiez les fichiers générés `config/morphic/Ekom/generated/ek_address.form.conf.php` et `config/morphic/Ekom/generated/ek_address.list.conf.php`
 ici `config/morphic/Ekom/back/users/address.form.conf.php` et là `config/morphic/Ekom/back/users/address.list.conf.php`
@@ -263,7 +266,8 @@ Cette modification permet de bien rediriger vers le formulaire de notre contrôl
 (et non pas le contrôleur auto-généré) lorsque l'utilisateur modifie un élément de la liste.
 
 
-###### Customisation des fichiers de configuration
+Etape 3: Customisation des fichiers de configuration
+--------------------------
 
 Et enfin, la partie la plus marrante, configurez les fichiers de configuration comme vous le souhaitez.
 Pour apprendre à configurer vos éléments morphic, je vous invite à consulter la [documentation officielle](http://www.ling-docs.ovh/kamille/#/tools/morphic?id=fichier-de-configuration-formulaire)
