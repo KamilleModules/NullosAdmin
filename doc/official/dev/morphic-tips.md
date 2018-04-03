@@ -32,6 +32,22 @@ Transformer une url en image
 
 
 
+Transformer un champ en utilisant une fonction custom
+---------------
+
+```php
+'colTransformers' => [
+    'label' => function ($value, array $row) {
+        return $value . " ( " . $row['name'] . " )";
+    },
+],
+```
+
+
+<img src="image/morphic-image.png" alt="Drawing"/>
+
+
+
 
 Transformer un code hexadécimal en couleur dans une liste
 ---------------
