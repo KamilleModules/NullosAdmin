@@ -1,3 +1,4 @@
+
 Soko Cheatsheet
 ====================
 2018-03-12
@@ -183,6 +184,20 @@ $choice_product_types = QuickPdo::fetchAll("select id, concat(id, \". \", name) 
 ```
 
 
+###### Liste acceptant la valeur NULL
+
+```php
+->addControl(SokoChoiceControl::create()
+    ->setName("generator_mode")
+    ->setLabel("Mode")
+    ->setChoices($choice_generators)
+    ->setProperties([
+        'nullableFirstItem' => "Aucune valeur",
+    ])
+)
+```
+
+
 ###### Afficher un lien supplémentaire
 
 ```php
@@ -237,6 +252,55 @@ Auto-complete
     ->setValue($addressId)
 )
 ```
+
+
+Auto-complete multipliable
+-----------------
+
+Attention, cet élément renvoie un tableau (les caractères [] sont ajoutés après le nom de chaque élément créé).
+
+```php
+        ->addControl(SokoAutocompleteInputControl::create()
+            ->setAutocompleteOptions(BackFormHelper::createSokoAutocompleteOptions([
+                'action' => "auto.product", // créez le service dans votre ecp/api.php
+            ]))
+            ->setProperties([
+                "multipliable" => true,
+                "multipliableOptions" => [
+                    "addBtnText" => "Ajouter ce produit à la sélection",
+                    "removeBtnText" => "Supprimer",
+                    "emptyValueTitle" => "Attention!",
+                    "emptyValueText" => "La valeur ne peut pas être vide",
+                    "acceptDuplicate" => false,
+                    "duplicateValueTitle" => "Attention!",
+                    "duplicateValueText" => "Cette valeur a déjà été ajoutée",
+                ],
+            ])
+            ->setName("apply_product_ids")
+            ->setLabel('Sélection des produits')
+            ->setValue($addressId)
+        )
+```
+
+Ou bien la même chose en plus court:
+
+
+```php
+        ->addControl(SokoAutocompleteInputControl::create()
+            ->setAutocompleteOptions(BackFormHelper::createSokoAutocompleteOptions([
+                'action' => "auto.product", // créez le service dans votre ecp/api.php
+            ]))
+            ->setProperties([
+                "multipliable" => true,
+                "multipliableOptions" => BackFormHelper::getSokoAutocompleteMultipleDefaultOptions(),
+            ])
+            ->setName("apply_product_ids")
+            ->setLabel('Sélection des produits')
+            ->setValue($addressId)
+        )
+```
+
+
 
 ###### Ajouter un lien supplémentaire
 

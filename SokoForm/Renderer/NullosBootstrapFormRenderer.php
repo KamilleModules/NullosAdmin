@@ -150,6 +150,60 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     }
 
 
+    protected function renderChoiceTennisList(array $model, array $preferences = [])
+    {
+
+        ?>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+            <div class="col-md-9 col-sm-9 col-xs-12">
+
+
+                <div class="tennis-court">
+                    <div class="tennis-side">
+
+                        <h4>Pays non sélectionnés</h4>
+                        <select multiple class="form-control">
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                        </select>
+                        <button>Ajouter <i class="fa fa-arrow-right"></i></button>
+                    </div>
+
+
+                    <div class="tennis-side tennis-side-right">
+
+                        <h4>Pays sélectionnés</h4>
+                        <select multiple class="form-control">
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                            <option>oieozehfozih e</option>
+                        </select>
+                        <button><i class="fa fa-arrow-left"></i> Retirer</button>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+        <?php
+
+    }
+
     protected function renderInputText(array $model, array $preferences = [])
     {
         $this->doRenderInputControl($model, $preferences);
@@ -283,6 +337,17 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             $cssId = StringTool::getUniqueCssId("select-");
             $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
             $readOnly = (array_key_exists("readonly", $properties) && (true === $properties['readonly']));
+
+            $nullableFirstItem = $properties['nullableFirstItem'] ?? null;
+            if ($nullableFirstItem) {
+                $tmp = $model['choices'];
+                $model['choices'] = [
+                    "" => $nullableFirstItem, // Note that the empty "" value naturally converts to null if the caller is using a tool like the xiao api gen
+                ];
+                $model['choices'] += $tmp;
+            }
+
+
             $sDisabled = "";
             if (true === $readOnly) {
                 $sDisabled = ' disabled="true"';
@@ -441,6 +506,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <?php
                 CategoryFancyTreeRenderer::create()
                     ->setCategories($categories)
+                    ->setName($model['name'])
                     ->setExpanded($expanded)
                     ->display();
                 ?>
@@ -855,20 +921,47 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         $model2 = $model;
                         $model2['name'] .= "-autocomplete";
                         $cssId2 = StringTool::getUniqueCssId("f2");
+                        $cssId3 = StringTool::getUniqueCssId("multi-");
 
 
                         $autocompleteOptions = $model2['autocompleteOptions'];
                         $action = $autocompleteOptions['action'];
+                        $isMultipliable = $properties['multipliable'] ?? false;
+
+                        //
+                        $multipliableOptions = $properties['multipliableOptions'] ?? [];
+                        $multipliableAddBtnText = $multipliableOptions['addBtnText'] ?? "Add this item";
+                        $multipliableRemoveBtnText = $multipliableOptions['removeBtnText'] ?? "Remove";
+                        $multipliableEmptyValueTitle = $multipliableOptions['emptyValueTitle'] ?? "Watch out!";
+                        $multipliableEmptyValueText = $multipliableOptions['emptyValueText'] ?? "The value cannot be empty";
+                        $multipliableDuplicateValueTitle = $multipliableOptions['duplicateValueTitle'] ?? "Watch out!";
+                        $multipliableDuplicateValueText = $multipliableOptions['duplicateValueText'] ?? "The value was already added";
+                        $multipliableAcceptDuplicate = $multipliableOptions['acceptDuplicate'] ?? false;
 
 
                         ?>
+
                         <div class="form-group auto-complete-container">
+
+
                             <?php
 
-                            $value2 = "";
-                            Hooks::call("NullosAdmin_SokoForm_NullosBootstrapRenderer_AutocompleteInitialValue", $value2, $action, $model['value']);
-                            $model2['value'] = $value2;
 
+                            $value2 = "";
+                            $multipliableItems = [];
+                            if ($isMultipliable) {
+                                $multipliableValues = $model['value'];
+                                if (!is_array($multipliableValues)) {
+                                    $multipliableValues = [$multipliableValues];
+                                }
+                                Hooks::call("NullosAdmin_SokoForm_NullosBootstrapRenderer_AutocompleteInitialValueMultiple", $multipliableItems, $action, $multipliableValues);
+                                $model['value'] = "";
+                            } else {
+                                Hooks::call("NullosAdmin_SokoForm_NullosBootstrapRenderer_AutocompleteInitialValue", $value2, $action, $model['value']);
+                            }
+
+
+                            $model2['value'] = $value2;
 
                             $extra = 'placeholder="Search..."';
                             if ($this->isReadOnly($model)) {
@@ -882,19 +975,74 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                             ?>
                             <!--                            <span class="fa fa-cloud-download form-control-feedback left" aria-hidden="true"></span>-->
                         </div>
+
+
+                    <?php if (true === $isMultipliable): ?>
+                        <div class="multiplier-gui" id="<?php echo $cssId3; ?>">
+
+                            <div>
+
+                                <button class="multiplier-add-btn"><i
+                                            class="fa fa-plus"></i> <?php echo $multipliableAddBtnText; ?></button>
+
+                                <div class="multiplier-items-container">
+                                    <?php foreach ($multipliableItems as $value => $label): ?>
+                                        <div class="multiplier-item">
+                                            <input class="multiplier-item-value-placeholder" type="hidden"
+                                                   value="<?php echo htmlspecialchars($value); ?>"
+                                                   name="<?php echo htmlspecialchars($model['name']); ?>[]">
+                                            <span class="multiplier-item-label"><?php echo $label; ?></span>
+                                            <button class="multiplier-delete-btn"><i
+                                                        class="fa fa-remove"></i> <?php echo $multipliableRemoveBtnText; ?>
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+
+                                </div>
+
+                                <div>
+
+                                </div>
+                                <div style="display: none">
+                                    <div class="multiplier-item-template">
+                                        <input class="multiplier-item-value-placeholder" type="hidden" value=""
+                                               name="<?php echo htmlspecialchars($model['name']); ?>[]">
+                                        <span class="multiplier-item-label">Doo</span>
+                                        <button class="multiplier-delete-btn"><i
+                                                    class="fa fa-remove"></i> <?php echo $multipliableRemoveBtnText; ?>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    <?php endif; ?>
+
+
                         <script>
                             jqueryComponent.ready(function () {
+
+                                var isMultipliable = <?php echo (true === $isMultipliable) ? "true" : "false"; ?>;
+                                var multipliableAcceptDuplicate = <?php echo (true === $multipliableAcceptDuplicate) ? "true" : "false"; ?>;
 
                                 /**
                                  * This is basic jqueryUi autocomplete
                                  * http://jqueryui.com/autocomplete/
                                  **/
+                                var jInput = $("#<?php echo $cssId; ?>");
+                                var jInput2 = $("#<?php echo $cssId2; ?>");
+
                                 var autoCompleteOptions = <?php echo json_encode($autocompleteOptions, \JSON_FORCE_OBJECT); ?>;
                                 autoCompleteOptions.select = function (event, ui) {
-                                    var jInput = $("#<?php echo $cssId; ?>");
                                     jInput.val(ui.item.id);
-                                    var jInput2 = $("#<?php echo $cssId2; ?>");
                                     jInput2.val(ui.item.label);
+
+                                    if (true === isMultipliable) {
+                                        jInput.removeAttr("name");
+                                    }
+
                                     /**
                                      * make the potential error message disappear (if using soko),
                                      * see soko doc and soko-form-error-removal-tool.js for more info
@@ -906,6 +1054,56 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
                                 $("#<?php echo $cssId2; ?>").autocomplete(autoCompleteOptions);
+
+
+                                if (true === isMultipliable) {
+
+                                    // note: we need to deal with strings here, otherwise the js array functions might not work correctly
+                                    var currentVals = <?php echo json_encode(array_map('strval', array_keys($multipliableItems))); ?>;
+
+                                    var jGui = $("#<?php echo $cssId3 ?>");
+                                    var o = new window.multiplierWidget({
+                                        gui: jGui,
+                                        multiplier: $('#<?php echo $cssId; ?>'),
+                                        onItemAddedBefore: function (value) {
+                                            if (!value) {
+                                                nullosApi.inst().notif({
+                                                    title: "<?php echo str_replace('"', '\"', $multipliableEmptyValueTitle); ?>",
+                                                    text: "<?php echo str_replace('"', '\"', $multipliableEmptyValueText); ?>",
+                                                    type: "error",
+                                                    icon: "fa fa-warning"
+                                                });
+                                                return false;
+                                            }
+
+
+                                            if (false === multipliableAcceptDuplicate && currentVals.indexOf(value) > -1) {
+                                                nullosApi.inst().notif({
+                                                    title: "<?php echo str_replace('"', '\"', $multipliableDuplicateValueTitle); ?>",
+                                                    text: "<?php echo str_replace('"', '\"', $multipliableDuplicateValueText); ?>",
+                                                    type: "error",
+                                                    icon: "fa fa-warning"
+                                                });
+                                                return false;
+                                            }
+                                            else {
+                                                currentVals.push(value);
+                                            }
+                                            return true;
+                                        },
+                                        onItemAddedAfter: function (jItem) {
+                                            jItem.find(".multiplier-item-label").html(jInput2.val());
+                                        },
+                                        onItemRemovedAfter: function (value, jItem) {
+                                            var index = currentVals.indexOf(value);
+                                            if (index > -1) {
+                                                currentVals.splice(index, 1);
+                                            }
+                                        },
+                                    });
+                                }
+
+
                             });
                         </script>
 
