@@ -76,6 +76,28 @@ Textarea
 )
 ```
 
+
+###### Limiter le nombre de caractères
+
+```php
+->addControl(SokoInputControl::create()
+    ->setName("description")
+    ->setLabel("Description")
+    ->setType("textarea")
+    ->setProperties([
+        "maxNbChars" => 256,
+//                "textMaxChars" => "Nombre de caractères max: %s.<br>",
+//                "textRemainingChars" => "Il vous reste %s caractères",
+        "textMaxChars" => "",
+        "textRemainingChars" => '<span class="limitcount-box">%s</span>',
+    ])
+)
+```
+
+
+<img src="image/soko-limitbox.png" alt="Drawing"/>
+
+
 ###### Wysiwyg
 
 ```php

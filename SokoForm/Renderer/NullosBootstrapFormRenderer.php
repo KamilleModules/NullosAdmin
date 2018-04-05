@@ -181,6 +181,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
         $properties = $model['properties'] ?? [];
+
+        $useLabelColumn = $properties['useLabelColumn'] ?? true;
+
         $leftTitle = $properties['leftTitle'] ?? "Not selected elements";
         $rightTitle = $properties['rightTitle'] ?? "Selected elements";
         $leftBtnText = $properties['leftBtnText'] ?? "Add";
@@ -192,8 +195,12 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
         ?>
         <div class="form-group">
+            <?php if(true===$useLabelColumn): ?>
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
             <div class="col-md-9 col-sm-9 col-xs-12">
+            <?php else: ?>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+            <?php endif; ?>
 
 
                 <div class="tennis-court" id="<?php echo $cssId; ?>">
@@ -560,6 +567,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     {
         $categories = $model['categories'];
         $expanded = array_key_exists("expanded", $model) ? $model['expanded'] : [];
+        if(null===$expanded){
+            $expanded=[];
+        }
         ?>
         <div class="form-group">
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
@@ -1249,6 +1259,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $properties = $model['properties'];
         $html = $properties['html'];
         $belowLabel = (array_key_exists("belowLabel", $properties) && true === $properties['belowLabel']) ? true : false;
+        $useLabelColumn = $properties['useLabelColumn'] ?? true;
         ?>
 
         <?php if (true === $belowLabel): ?>
@@ -1259,12 +1270,23 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <?php echo $html; ?>
         </div>
     <?php else: ?>
-        <div class="form-group">
-            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
-            <div class="col-md-9 col-sm-9 col-xs-12">
-                <?php echo $html; ?>
+
+
+        <?php if (true === $useLabelColumn): ?>
+
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <?php echo $html; ?>
+                </div>
             </div>
-        </div>
+        <?php else: ?>
+            <div class="form-group">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <?php echo $html; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 
 
@@ -1439,6 +1461,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $wysiwyg = (array_key_exists('wysiwyg', $properties)) ? $properties['wysiwyg'] : false;
         $showSerializeOnly = $properties['showSerializeOnly'] ?? false;
         $rows = $properties['rows'] ?? null;
+        $maxNbChars = $properties['maxNbChars'] ?? null;
+
+
         ?>
 
         <?php if ($wysiwyg): ?>
@@ -1458,7 +1483,14 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         <?php DebugTool::dump(unserialize($model['value'])); ?>
         <input readonly type="hidden" name="<?php echo htmlspecialchars($model['name']); ?>"
                value="<?php echo htmlspecialchars($model['value']); ?>">
-    <?php else: ?>
+    <?php else:
+
+
+    $cssId2 = StringTool::getUniqueCssId("textarea-limitcount-");
+    ?>
+
+
+
 
         <textarea
             <?php if ($this->isRequired($model)): ?>
@@ -1473,11 +1505,53 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <?php if ($rows): ?>
                 rows="<?php echo $rows; ?>"
             <?php endif; ?>
+            <?php if($maxNbChars): ?>
+            maxlength="<?php echo $maxNbChars; ?>"
+            onKeyDown="limitText(this.form.limitedtextarea,this.form.countdown,100);"
+            onKeyUp="limitText(this.form.limitedtextarea,this.form.countdown,100);"
+            <?php endif; ?>
+
                 type="<?php echo $inputType; ?>"
                 name="<?php echo htmlspecialchars($model['name']); ?>"
                 id="<?php echo $cssId; ?>"
                 class="form-control col-md-7 col-xs-12 an-editor-wrapper"
         ><?php echo $model['value']; ?></textarea>
+
+        <?php if($maxNbChars):
+
+
+         $textMaxChars = $properties['textMaxChars'] ?? "Maximum characters: %s<br>";
+         $textRemainingChars = $properties['textRemainingChars'] ?? "You have %s characters left.";
+         ?>
+        <div>
+            <?php if($textMaxChars): ?>
+            <?php echo sprintf($textMaxChars, $maxNbChars); ?>
+            <?php endif; ?>
+            <?php if($textRemainingChars): ?>
+            <?php echo sprintf($textRemainingChars, '<input id="'. $cssId2 .'" readonly type="text" name="countdown" size="3" value="'. $maxNbChars .'">'); ?>
+            <?php endif; ?>
+        </div>
+        <script>
+        jqueryComponent.ready(function () {
+           var limitNum = <?php echo $maxNbChars; ?>;
+           var jTextarea = $('#<?php echo $cssId; ?>');
+           var jCounter = $('#<?php echo $cssId2; ?>');
+
+
+           jTextarea.on('keyup.maxNbChars', function(){
+               var currentLength = $(this)[0].value.length;
+               if(currentLength > limitNum){
+                   $(this)[0].value = $(this)[0].value.substring(0, limitNum);
+               }
+               var remainingChars = limitNum - currentLength;
+               jCounter.val(remainingChars);
+
+           });
+
+        });
+        </script>
+        <?php endif; ?>
+
 
     <?php endif; ?>
 

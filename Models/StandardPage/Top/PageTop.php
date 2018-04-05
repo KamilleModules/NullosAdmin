@@ -7,6 +7,7 @@ namespace Module\NullosAdmin\Models\StandardPage\Top;
 class PageTop
 {
     protected $title;
+    protected $description;
     /**
      * @var BreadCrumbs
      */
@@ -21,6 +22,7 @@ class PageTop
     public function __construct()
     {
         $this->title = "";
+        $this->description = "";
     }
 
 
@@ -36,12 +38,27 @@ class PageTop
         return $this;
     }
 
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
     /**
      * @return string
      */
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
     }
 
     /**

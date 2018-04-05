@@ -20,6 +20,46 @@ qui propose les méthodes suivantes:
 
 
 
+
+Code d'exemple
+-------------------
+
+```php
+<?php
+
+
+namespace Controller\ApplicationModules\Back\Modules;
+
+
+use Controller\NullosAdmin\Back\NullosStandardPageController;
+use Kamille\Utils\Claws\ClawsWidget;
+
+class ModulesListController extends NullosStandardPageController
+{
+    public function render()
+    {
+
+
+        $pageTop = $this->pageTop();
+        $pageTop->setTitle("Le titre de ma page");
+        $pageTop->breadcrumbs()->addLink("page 1");
+        $pageTop->rightBar()->addButton("Bouton d'action", "#", "fa fa-list");
+
+
+        $this->prepareClaws();
+        $this->getClaws()->setWidget("maincontent.table", ClawsWidget::create()
+            ->setTemplate("NullosAdmin/Main/InfoTable/prototype")
+            ->setConf([
+            ])
+        );
+
+        return parent::doRenderClaws();
+    }
+}
+```
+
+
+
 PageTop
 ----------
 
