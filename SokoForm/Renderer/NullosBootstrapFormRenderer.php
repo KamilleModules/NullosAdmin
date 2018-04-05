@@ -103,10 +103,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $r->submitKey();
 
         ?>
-
         <?php if (false === $isFakeForm): ?>
         <?php $r->submitButton($submitBtnPreferences); ?>
         </form>
+    <?php else: ?>
+        <div class="clearfix"></div>
     <?php endif; ?>
 
         <?php
@@ -138,6 +139,15 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         if ($ret) {
             return $ret;
         }
+
+
+        $identifier = null;
+        Hooks::call("NullosAdmin_SokoFormRenderer_getRenderIdentifier", $identifier, $className);
+        if (null !== $identifier) {
+            return $identifier;
+        }
+
+
         return parent::getRenderIdentifier($controlModel);
 
     }
@@ -152,6 +162,33 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
     protected function renderChoiceTennisList(array $model, array $preferences = [])
     {
+        $allChoices = $model['choices'];
+        ksort($allChoices); // ?
+        $selected_values = $model['selectedKeys'] ?? [];
+
+
+        $selected = [];
+        $notSelected = [];
+
+        foreach ($allChoices as $val => $label) {
+            $val = (string)$val;
+            if (in_array($val, $selected_values, true)) {
+                $selected[$val] = $label;
+            } else {
+                $notSelected[$val] = $label;
+            }
+        }
+
+
+        $properties = $model['properties'] ?? [];
+        $leftTitle = $properties['leftTitle'] ?? "Not selected elements";
+        $rightTitle = $properties['rightTitle'] ?? "Selected elements";
+        $leftBtnText = $properties['leftBtnText'] ?? "Add";
+        $rightBtnText = $properties['rightBtnText'] ?? "Remove";
+
+
+        $cssId = StringTool::getUniqueCssId("tennis-");
+
 
         ?>
         <div class="form-group">
@@ -159,47 +196,71 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <div class="col-md-9 col-sm-9 col-xs-12">
 
 
-                <div class="tennis-court">
+                <div class="tennis-court" id="<?php echo $cssId; ?>">
                     <div class="tennis-side">
 
-                        <h4>Pays non sélectionnés</h4>
-                        <select multiple class="form-control">
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
+                        <h4><?php echo $leftTitle; ?></h4>
+                        <select multiple="multiple" class="form-control left-select" size="10">
+                            <?php foreach ($notSelected as $val => $label): ?>
+                                <option value="<?php echo htmlspecialchars($val); ?>"><?php echo $label; ?></option>
+                            <?php endforeach; ?>
                         </select>
-                        <button>Ajouter <i class="fa fa-arrow-right"></i></button>
+                        <button class="left-btn"><?php echo $leftBtnText; ?> <i class="fa fa-arrow-right"></i></button>
                     </div>
 
 
                     <div class="tennis-side tennis-side-right">
 
-                        <h4>Pays sélectionnés</h4>
-                        <select multiple class="form-control">
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
-                            <option>oieozehfozih e</option>
+                        <h4><?php echo $rightTitle; ?></h4>
+                        <select
+                                name="<?php echo htmlspecialchars($model['name']); ?>[]"
+                                multiple="multiple" class="form-control right-select" size="10">
+                            <?php foreach ($selected as $val => $label): ?>
+                                <option selected="selected"
+                                        value="<?php echo htmlspecialchars($val); ?>"><?php echo $label; ?></option>
+                            <?php endforeach; ?>
                         </select>
-                        <button><i class="fa fa-arrow-left"></i> Retirer</button>
+                        <button class="right-btn"><i class="fa fa-arrow-left"></i> <?php echo $rightBtnText; ?></button>
                     </div>
-
 
 
                 </div>
             </div>
         </div>
+
+        <script>
+            jqueryComponent.ready(function () {
+                var jHost = $('#<?php echo $cssId; ?>');
+                var jLeftSelect = $('.left-select', jHost);
+                var jLeftBtn = $('.left-btn', jHost);
+                var jRightSelect = $('.right-select', jHost);
+                var jRightBtn = $('.right-btn', jHost);
+
+
+                function getSelectedOptions(jSelect) {
+                    return jSelect.find(':selected');
+                }
+
+                jLeftBtn.on('click', function () {
+                    var jOptions = getSelectedOptions(jLeftSelect);
+                    jRightSelect.append(jOptions);
+                    return false;
+                });
+
+                jRightBtn.on('click', function () {
+                    var jOptions = getSelectedOptions(jRightSelect);
+                    jLeftSelect.append(jOptions);
+                    return false;
+                });
+
+
+                jHost.closest('form').on('submit.tennis', function () {
+                    jRightSelect.find('option').prop('selected', true);
+                });
+
+            });
+        </script>
+
         <?php
 
     }

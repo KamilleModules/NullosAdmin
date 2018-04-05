@@ -268,3 +268,46 @@ Ajouter un filtre de type "date"
 
 
 <img src="image/morphic-filter-date.png" alt="Drawing"/>
+
+
+
+Filtres pre/post
+---------------
+
+Les filtres pre/post sont essentiellement utilisés pour les valeurs sérialisées.
+Le filtre de type "pre" intervient lorsque la donnée sort de la base de données et va vers le formulaire (on a alors besoin
+de désérialiser), tandis que le filtre de type "post" est utilisé lorsque le formulaire est posté, et juste avant
+d'insérer les données dans la base de données (on doit alors sérialiser les données).
+
+
+Les filtres pre/post se placent respectivement au niveau des propriétés `feed` et `process` proposées par le fichier
+de configuration de formulaire morphic.
+
+
+
+
+```php
+    'feed' => MorphicHelper::getFeedFunction("kamille.ek_coupon", function (SokoFormInterface $form) {
+        if (SessionTool::pickupFlag("form-generated-ek_coupon")) {
+            $form->addNotification("Le coupon a bien été ajouté", "success");
+        }
+    }, [], [
+        'filters' => [ // pre-filter
+            "unserializeArray" => [
+                "cond_country_id",
+            ],
+        ],
+    ]),
+    'process' => function ($fData, SokoFormInterface $form) use ($isUpdate, $ric, $id) {
+
+
+        MorphicHelper::applyPostFilters($fData, [ // post filter, ici, les valeurs NULL restent NULL, seuls les arrays sont sérialisés
+            "serializeIfArray" => [
+                'cond_country_id',
+            ],
+        ]);
+
+        // ... update/insert in the database
+        return false;
+    },
+```

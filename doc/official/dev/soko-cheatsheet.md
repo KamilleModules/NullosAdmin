@@ -217,6 +217,28 @@ $choice_product_types = QuickPdo::fetchAll("select id, concat(id, \". \", name) 
 ```
 
 
+###### Afficher une liste de type tennis
+
+```php
+->addControl(SokoTennisListChoiceControl::create()
+    ->setName("cond_country_id")
+    ->setLabel("Pays")
+    ->setChoices($choice_countries)
+    ->setProperties([
+        'leftBtnText' => "Ajouter",
+        'rightBtnText' => "Retirer",
+        'leftTitle' => "Pays non sélectionnés",
+        'rightTitle' => "Pays sélectionnés",
+    ])
+)
+```
+
+
+
+<img src="image/morphic-tennis-list.png" alt="Drawing"/>
+
+
+
 ###### Réagir par rapport à un autre élément
 
 
