@@ -6,6 +6,7 @@ namespace Module\NullosAdmin\Utils;
 
 use Core\Services\A;
 use Kamille\Architecture\ApplicationParameters\ApplicationParameters;
+use Kamille\Architecture\Registry\ApplicationRegistry;
 
 class N
 {
@@ -39,5 +40,6 @@ class N
     public static function lang()
     {
         return "fra";
+        return ApplicationRegistry::get("lang");
     }
 }
