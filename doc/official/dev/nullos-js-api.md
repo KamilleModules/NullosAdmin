@@ -14,7 +14,9 @@ Elle expose les méthodes suivantes:
 
 - confirm
 - notif
+- modal
 - request
+- request2Modal
 - on
 - off
 - once
@@ -45,6 +47,51 @@ nullosApi.inst().confirm(confirmText, function () {
     alert("ok");
 }, confirmTitle, confirmButtonOkText, confirmButtonCancelText);
 ```
+
+
+ 
+modal
+------------
+
+
+Cette méthode permet d'afficher un dialogue modal.
+
+
+
+Version minimale
+
+```js 
+nullosApi.inst().modal("Hi");
+```
+
+Version maximale:
+
+```js
+/**
+ * The modal's interface is this:
+ *
+ * function open ( string text, callable onSuccess, string ?title, string ?okBtnText, string ?cancelBtnText)
+ * function freeOpen ( string html, options)
+ *          options:
+ *              - title: null|string, the title of the modal. If null, no title will be displayed.
+ *              - onOpenAfter:
+ *                      callback ( jContainer )
+ *                          with jContainer: a jquery element containing the modal's content container.
+ *              - onCloseBefore:
+ *                      callback ( jContainer )
+ *                          with jContainer: a jquery element containing the modal's content container.
+ *
+ */
+var api = nullosApi.inst();
+api.modal("Salut, je suis un modal", {
+    title: "Le titre",
+    onOpenAfter: function(jContainer){},
+    onCloseBefore: function(jContainer){}
+});
+
+```
+
+<img src="image/nullos-modal.png" alt="Drawing"/>
 
 
  
@@ -96,6 +143,35 @@ L'exemple ci-dessous appelle le ecp de Ekom (`service/Ekom/ecp/api.php`) avec l'
 ```js
 nullosApi.inst().request("Ekom:back.morphic", data, function (response) {
     // now do something with the response...
+});
+```
+
+
+request2Modal
+-----------------
+
+Permet de faire une requête [ecp](https://github.com/lingtalfi/Ecp), dont le retour s'affiche dans un modal (en cas de succès).
+
+
+
+```js
+nullosApi.inst().request2Modal("Ekom:back.coupon-tennis", {
+    type: type,
+    values: values
+}, {
+    onCloseBefore: function (jModal) {
+        var jRightSelect = jModal.find('.right-select');
+        var values = [];
+        jRightSelect.find('option').each(function () {
+            values.push($(this).val());
+        });
+
+        var sValues = values.join(',');
+        var count = values.length;
+
+        jCriteriaItem.find('.values-count').val(count);
+        jCriteriaItem.attr('data-values', sValues);
+    }
 });
 ```
 
