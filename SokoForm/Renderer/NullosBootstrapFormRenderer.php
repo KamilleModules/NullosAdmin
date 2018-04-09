@@ -33,7 +33,14 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
         $options = array_replace([
             "description" => null,
+            /**
+            * A fake form won't display the form tag, and won't display the submit button
+             */
             "isFakeForm" => false,
+            /**
+            * To hide the submit button only
+             */
+            "hideSubmitBtn" => false,
             "submitBtnLabel" => "Enregistrer",
         ], $options);
         $submitBtnPreferences = [
@@ -41,6 +48,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         ];
         $isFakeForm = $options['isFakeForm'];
         $description = $options['description'];
+        $hideSubmitBtn = $options['hideSubmitBtn'];
 
 
         if (null === $cssId) {
@@ -94,7 +102,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                             $r->render($col);
                         }
                     }
-                    ?></fieldset>
+                    ?>
+                </fieldset>
                 <?php
             }
         }
@@ -103,12 +112,22 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $r->submitKey();
 
         ?>
-        <?php if (false === $isFakeForm): ?>
+        <?php if (false === $isFakeForm && false=== $hideSubmitBtn): ?>
         <?php $r->submitButton($submitBtnPreferences); ?>
         </form>
     <?php else: ?>
         <div class="clearfix"></div>
     <?php endif; ?>
+
+    <script>
+    jqueryComponent.ready(function () {
+        var jContext = $('#<?php echo $cssId; ?>');
+        var errorRemoval = new SokoFormErrorRemovalTool({
+            context: jContext
+        });
+        errorRemoval.refresh();
+    });
+    </script>
 
         <?php
     }
@@ -407,6 +426,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             $readOnly = (array_key_exists("readonly", $properties) && (true === $properties['readonly']));
 
             $nullableFirstItem = $properties['nullableFirstItem'] ?? null;
+            $onChangeRedirectUriFmt = $properties['onChangeRedirectUriFmt'] ?? null;
+
+
             if ($nullableFirstItem) {
                 $tmp = $model['choices'];
                 $model['choices'] = [
@@ -536,12 +558,30 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
             <?php endif; ?>
-            <?php echo $this->renderExtraLink($properties); ?>
-            <?php
 
+            <?php echo $this->renderExtraLink($properties); ?>
+
+
+            <?php if($onChangeRedirectUriFmt): ?>
+                <script>
+                jqueryComponent.ready(function () {
+                    var jSelect = $('#<?php echo $cssId; ?>');
+                    jSelect.on('change.autoSubmit', function(){
+                        var value = $(this).val();
+                        var newUri = "<?php echo str_replace('"','\"',$onChangeRedirectUriFmt); ?>";
+                        newUri = newUri.replace('{value}', value);
+                        window.location.href = newUri;
+                    });
+                });
+                </script>
+            <?php endif; ?>
+
+
+            <?php
         } else {
             throw new \Exception("not handled yet with type=$type");
         }
+
     }
 
     protected function renderChoiceBooleanList(array $model, array $preferences = [])

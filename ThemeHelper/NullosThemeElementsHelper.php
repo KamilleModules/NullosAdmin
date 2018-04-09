@@ -4,9 +4,77 @@
 namespace Module\NullosAdmin\ThemeHelper;
 
 
+use Kamille\Architecture\ApplicationParameters\ApplicationParameters;
+use Kamille\Mvc\HtmlPageHelper\HtmlPageHelper;
+use Kamille\Services\XConfig;
+
 class NullosThemeElementsHelper
 {
 
+
+    /**
+     * Quick rendering of a nullos page...
+     * Useful for testing your morphic lists for instance.
+     *
+     *
+     *
+     *
+     * @param callable $render , just displays the page content
+     *
+     * @throws \Exception
+     */
+    public static function renderHtmlPage(callable $render)
+    {
+        ApplicationParameters::set("theme", "nullosAdmin");
+
+        ob_start();
+        call_user_func($render);
+        $content = ob_get_clean();
+
+        ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <?php HtmlPageHelper::displayHead(); ?>
+        <body>
+
+
+        <?php
+        NullosThemeElementsHelper::renderJqueryComponent();
+        echo $content;
+        ?>
+        <?php HtmlPageHelper::displayBodyEndSection(false); ?>
+        </body>
+        </html>
+        <?php
+    }
+
+
+    public static function renderJqueryComponent()
+    {
+        ?>
+        <script>
+            //----------------------------------------
+            // https://github.com/lingtalfi/jqueryComponent
+            //----------------------------------------
+            window.jqueryComponent = {
+                ready: function (callback) {
+                    if (window.jQuery) {
+                        callback();
+                    }
+                    else {
+                        document.addEventListener("DOMContentLoaded", function (event) {
+                            $(document).ready(function () {
+                                callback();
+                            });
+                        });
+                    }
+                }
+            };
+            window.NullosBackUri = '<?php echo XConfig::get("Core.uriPrefixBackoffice"); ?>';
+
+        </script>
+        <?php
+    }
 
     public static function renderBlueLink($text, $href, $isExternal = true)
     {

@@ -16,6 +16,9 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
     public static function displayAll(array $conf, $cssId = null)
     {
 
+        if (null === $cssId) {
+            $cssId = StringTool::getUniqueCssId("form-");
+        }
         $form = $conf['form'];
         parent::displayForm($form, $cssId, $conf);
         if (array_key_exists("formAfterElements", $conf)) {
@@ -32,7 +35,7 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
          * and display just the list (i.e. we do not display the form because it's confusing for the user).
          *
          */
-        $context = $conf['context'];
+        $context = $conf['context'] ?? null;
         $uri = $_SERVER['REQUEST_URI'];
         if (false !== ($pos = strpos($uri, '?'))) {
             $uri = substr($uri, 0, $pos);
@@ -51,6 +54,7 @@ class NullosMorphicBootstrapFormRenderer extends NullosBootstrapFormRenderer
                 };
             });
         </script>
+
         <?php
     }
 
