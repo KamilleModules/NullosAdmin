@@ -1078,6 +1078,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                             if ($this->isReadOnly($model)) {
                                 $extra = '';
                             }
+
+                            if(array_key_exists("properties", $model2)){ // avoid duplicate info box
+                                unset($model2['properties']['info']);
+                            }
+
                             $this->displayInputWidget($model2, "text", $cssId2, "form-control has-feedback-left", $extra); // visual control for holding label;
                             ?>
                             <?php

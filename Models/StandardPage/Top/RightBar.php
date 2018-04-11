@@ -46,15 +46,15 @@ class RightBar
     //--------------------------------------------
     //
     //--------------------------------------------
-    public function addButton(string $text, string $link, string $icon = null)
+    public function addButton(string $text, string $link, string $icon = null, string $btnClass=null)
     {
-        $this->elements[] = $this->getButtonElement($text, $link, $icon);
+        $this->elements[] = $this->getButtonElement($text, $link, $icon, $btnClass);
         return $this;
     }
 
-    public function prependButton(string $text, string $link, string $icon = null)
+    public function prependButton(string $text, string $link, string $icon = null, string $btnClass=null)
     {
-        array_unshift($this->elements, $this->getButtonElement($text, $link, $icon));
+        array_unshift($this->elements, $this->getButtonElement($text, $link, $icon, $btnClass));
         return $this;
     }
 
@@ -76,12 +76,13 @@ class RightBar
     //--------------------------------------------
     //
     //--------------------------------------------
-    private function getButtonElement(string $text, string $link, string $icon = null)
+    private function getButtonElement(string $text, string $link, string $icon = null, string $btnClass = null)
     {
         $el = [
             "type" => "button",
             "text" => $text,
             "link" => $link,
+            "class" => $btnClass,
         ];
         if ($icon) {
             $el['icon'] = $icon;

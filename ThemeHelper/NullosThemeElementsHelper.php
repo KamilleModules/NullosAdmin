@@ -156,4 +156,36 @@ class NullosThemeElementsHelper
         <?php
         return ob_get_clean();
     }
+
+
+    /**
+     * @param array $buttons , each of which:
+     *              - label
+     *              - link
+     *              - ?class
+     *              - icon
+     * @return string
+     */
+    public static function renderButtonGroup(array $buttons)
+    {
+        ob_start();
+        ?>
+        <div class="btn-group" style="display: flex">
+            <?php foreach ($buttons as $button):
+                $link = $button['link'];
+                $text = $button['label'];
+                $icon = $button['icon'] ?? null;
+                $class = $button['class'] ?? "btn btn-sm btn-default";
+                ?>
+                <a href="<?php echo htmlspecialchars($link); ?>" class="<?php echo $class; ?>" type="button">
+                    <?php if ($icon): ?>
+                        <i class="<?php echo $icon; ?>"></i>
+                    <?php endif; ?>
+                    <?php echo $text; ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
 }

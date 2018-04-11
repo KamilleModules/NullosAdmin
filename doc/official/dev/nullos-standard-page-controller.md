@@ -16,6 +16,7 @@ qui propose les méthodes suivantes:
 
 - [pageTop](#pagetop)
 - [noPageTop](#nopagetop)
+- [topAlert](#topalert)
 - [errorTemplate](#errortemplate)
 
 
@@ -65,10 +66,11 @@ PageTop
 
 PageTop représente la partie haute du maincontent dans un layout classique.
 
-Il y a 3 parties (voir image):
+Il y a 4 parties:
 
 - breadcrumbs: le fil d'arianne situé en haut à gauche
 - le titre
+- la description (sous le titre)
 - la partie droite (appelée RightBar) qui contient les boutons d'action généraux de la page
 
 
@@ -77,6 +79,7 @@ Il y a 3 parties (voir image):
 
 - `pageTop()`: accès à l'object PageTop situé ici: `class-modules/NullosAdmin/Models/StandardPage/Top/PageTop.php`
     - `setTitle`: définit le titre de la page
+    - `setDescription`: définit la description à placer sous le titre
     - `breadCrumbs()`:  accès à l'objet `Breadcrumbs` qui a les méthodes suivantes:
         - `addLink`: ajoute un lien au breadcrumb            
         - `addText`: ajoute un texte au breadcrumb
@@ -100,6 +103,43 @@ noPageTop est une méthode qui supprime le pageTop.
 Cette méthode peut être utile dans le où vous codez une gui "from scratch", et vous n'avez pas la nécessité d'utiliser 
 le widget pageTop.
 
+
+
+
+topAlert
+----------
+
+La méthode topAlert vous permet d'ajouter une alerte rapidement, sous le pageTop.
+
+
+Exemple de code:
+
+```php
+$this->topAlert("", <<<EEE
+Les groupes basiques permettent de placer un groupe de produits sur le front, par exemple dans les carousels.<br>
+Voici les carousels proposés par le thème XXX utilisé actuellement sur le site:
+
+EEE
+            , "fa fa-warning", "warning"
+        );
+```
+
+Les arguments sont:
+
+- title 
+- text
+- icon
+- type:
+    - warning
+    - info
+    - error
+    - success
+
+
+
+<img src="image/nullos-top-alert.png" alt="Drawing"/>
+
+Note: sur l'image, l'icône n'est pas positionnée car le titre est vide. L'icône s'ajoute au titre.
 
 
 
