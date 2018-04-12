@@ -218,16 +218,25 @@ EEE;
                         if (!is_array($classes)) {
                             $classes = [$classes];
                         }
+                        $icon = $item['icon'] ?? null;
 
                         $sClasses = implode(' ', $classes);
                         $sAttr = '';
-                        if($attributes){
+                        if ($attributes) {
                             $sAttr = StringTool::htmlAttributes($attributes);
+                        }
+
+                        $sIcon = "";
+                        if ($icon) {
+                            $sIcon .= '<i class="' . $icon . '"></i>';
                         }
 
 
                         $sLinks .= <<<EEE
-<li><a class="$sClasses" $sAttr href="$link">$item[label]</a></li>
+<li><a class="$sClasses" $sAttr href="$link">
+$sIcon
+$item[label]
+</a></li>
 EEE;
 
                         $sLinks .= PHP_EOL;
