@@ -311,3 +311,22 @@ de configuration de formulaire morphic.
         return false;
     },
 ```
+
+
+
+Ajouter une action de ligne
+---------------
+
+```php
+// $linkProductFmt = A::link("Ekom_Catalog_Product_Form") . '?product_id=';
+"formRouteExtraActions" => [
+    [
+        "name" => "updateProduct",
+        "label" => "Modifier le produit",
+        "icon" => "fa fa-book",
+        "link" => function (array $row) use ($linkProductFmt) {
+            return $linkProductFmt . $row['product_id'];
+        },
+    ],
+],
+```
