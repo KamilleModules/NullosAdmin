@@ -705,6 +705,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
             <div class="col-md-9 col-sm-9 col-xs-12 <?php echo $sErrorClass; ?>">
                 <div class="ui-widget">
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-plus-square"></i></span>
                     <select <?php echo $sDisabled; ?>
 
                         <?php if ($comboBoxName): ?>
@@ -725,7 +728,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                     value="<?php echo htmlspecialchars($value); ?>"><?php echo $label; ?></option>
                         <?php endforeach; ?>
                     </select>
-
+                    </div>
                 </div>
                 <?php $this->doRenderError($model, $preferences); ?>
 
