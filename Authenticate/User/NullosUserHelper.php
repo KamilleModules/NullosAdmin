@@ -17,6 +17,7 @@ class NullosUserHelper
     {
         $errorType = 0;
         $userInfo = NullosAdminUserLayer::getUserInfoByEmailPassword($email, $pass, $errorType);
+
         if (false !== $userInfo) {
 
 
