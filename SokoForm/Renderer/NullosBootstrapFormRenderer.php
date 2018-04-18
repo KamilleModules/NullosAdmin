@@ -1442,6 +1442,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $hasColorPicker = (array_key_exists("colorPicker", $properties) && true === $properties['colorPicker']);
 
 
+
+        $value = $model['value'];
+        if(is_array($value) && empty($value)){
+            $value="";
+        }
         ?>
 
         <?php if (true === $hasColorPicker): ?>
@@ -1464,7 +1469,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     type="<?php echo $inputType; ?>"
 
                     name="<?php echo htmlspecialchars($model['name']); ?>"
-                    value="<?php echo htmlspecialchars($model['value']); ?>"
+                    value="<?php echo htmlspecialchars($value); ?>"
                     id="<?php echo $cssId; ?>"
                 <?php if ($cssClass): ?>
                     class="<?php echo $cssClass; ?>"
