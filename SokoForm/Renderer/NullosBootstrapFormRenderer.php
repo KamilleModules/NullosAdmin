@@ -182,7 +182,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     protected function renderChoiceTennisList(array $model, array $preferences = [])
     {
         $allChoices = $model['choices'];
-        ksort($allChoices); // ?
+//        ksort($allChoices); // ?
         $selected_values = $model['selectedKeys'] ?? [];
 
 
@@ -207,6 +207,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $rightTitle = $properties['rightTitle'] ?? "Selected elements";
         $leftBtnText = $properties['leftBtnText'] ?? "Add";
         $rightBtnText = $properties['rightBtnText'] ?? "Remove";
+        $infoText = $properties['info'] ?? "";
+
 
 
         $cssId = StringTool::getUniqueCssId("tennis-");
@@ -221,7 +223,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             <div class="col-md-12 col-sm-12 col-xs-12">
             <?php endif; ?>
 
-
+ <?php
+                  if ($infoText) {
+                        $this->printInfoBox($infoText);
+                  }
+                 ?>
                 <div class="tennis-court" id="<?php echo $cssId; ?>">
                     <div class="tennis-side">
 
@@ -251,6 +257,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
                 </div>
+
+
             </div>
         </div>
 
