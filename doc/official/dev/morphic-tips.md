@@ -330,3 +330,22 @@ Ajouter une action de ligne
     ],
 ],
 ```
+
+
+
+Créer sa propre classe d'actions
+---------------
+
+Utilisez le hook `NullosAdmin_MorphicHelper_StandardColTransformer`.
+Exemples:
+
+- \Module\Ekom\Back\Helper\BackHooksHelper::NullosAdmin_MorphicHelper_StandardColTransformer
+- \Module\EkomUserTracker\Helper\EkomUserTrackerBackHooksHelper::NullosAdmin_MorphicHelper_StandardColTransformer
+- \Module\EkomCartTracker\Helper\EkomCartTrackerBackHooksHelper::NullosAdmin_MorphicHelper_StandardColTransformer
+
+
+Par convention, les nouvelles actions que vous proposez doivent commencer par le nom du module suivi d'un point.
+
+Par exemple, le module Ekom propose l'action suivante:
+
+- `Ekom.price`
