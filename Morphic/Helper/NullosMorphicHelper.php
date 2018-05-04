@@ -5,6 +5,7 @@ namespace Module\NullosAdmin\Morphic\Helper;
 
 
 use ArrayToString\ArrayToStringTool;
+use Bat\FileSystemTool;
 use Bat\StringTool;
 use Core\Services\Hooks;
 use Module\NullosAdmin\Exception\NullosException;
@@ -122,6 +123,29 @@ class NullosMorphicHelper
                         $s .= ' title="' . htmlspecialchars($title) . '"';
                     }
                     $s .= '>';
+                    return $s;
+                };
+                break;
+            case "media":
+                $width = $options['width'] ?? 80;
+                $title = $options['title'] ?? null;
+                return function ($value, array $row) use ($width, $title) {
+
+                    $ext = strtolower(FileSystemTool::getFileExtension($value));
+
+                    if (in_array($ext, ['mp4'])) {
+                        $s = '<video controls src="' . $value . '"  width="' . $width . '"></video>';
+
+                    } else {
+                        $s = '<img src="' . $value . '" alt="image" width="' . $width . '"';
+                        if ($title) {
+                            if (is_callable($title)) {
+                                $title = call_user_func($title, $row);
+                            }
+                            $s .= ' title="' . htmlspecialchars($title) . '"';
+                        }
+                        $s .= '>';
+                    }
                     return $s;
                 };
                 break;

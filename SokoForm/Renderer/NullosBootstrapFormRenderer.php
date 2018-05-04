@@ -5,6 +5,7 @@ namespace Module\NullosAdmin\SokoForm\Renderer;
 
 
 use Bat\DebugTool;
+use Bat\FileSystemTool;
 use Bat\StringTool;
 use Core\Services\A;
 use Core\Services\Hooks;
@@ -335,17 +336,26 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         $profileId = $model['profileId'];
         $payload = $model['payload'];
 
+        $value = $model['value'];
 
         $fileType = "image";
-        $value = $model['value'];
+
+        if($value){
+            $extension = FileSystemTool::getFileExtension($value);
+            if(in_array($extension, ["mp4"])) {
+                $fileType = "video";
+            }
+        }
+
+
 
 
         $text = "Glissez vos fichiers ici";
 
         $sStarted = "";
-        if (empty($value)) {
-            $sStarted = "not-started";
-        }
+//        if (empty($value)) {
+//            $sStarted = "not-started";
+//        }
 
         ?>
         <div class="form-group nullos-dropzone-container <?php echo $sStarted; ?>">
@@ -361,6 +371,8 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     <?php if ($value): ?>
                         <?php if ('image' === $fileType): ?>
                             <img src="<?php echo htmlspecialchars($value); ?>" width="250"/>
+                        <?php elseif ('video' === $fileType): ?>
+                            <video src="<?php echo htmlspecialchars($value); ?>" width="250"></video>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
@@ -398,8 +410,16 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                 if (true === response.success) {
                                     // myDropzone.removeAllFiles();
                                     var url = response.url;
-                                    jNullosDropZone.empty().append('<img width="250" src="' + url + '" >');
+                                    var extension  = url.split('.').pop();
+
+                                    if(-1 !== $.inArray(extension, ["mp4"])){
+                                        jNullosDropZone.empty().append(' <video width="250" src="'+ url +'" controls></video> ');
+                                    }
+                                    else{
+                                        jNullosDropZone.empty().append('<img width="250" src="' + url + '" >');
+                                    }
                                     jInput.val(url);
+
                                 }
                                 else {
                                     if (response.errors) {
@@ -410,6 +430,19 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                             type: "error"
                                         });
                                         jNullosDropZone.find(".ajaxloader").remove();
+                                    }
+                                    else{
+                                        /**
+                                        * Implementing ecp error handling manually
+                                        */
+                                        if(response['$$error$$']){
+                                            api.notif({
+                                            title: "Des erreurs se sont produites",
+                                            text: response['$$error$$'],
+                                            type: "error"
+                                        });
+                                        jNullosDropZone.find(".ajaxloader").remove();
+                                        }
                                     }
                                 }
                             })

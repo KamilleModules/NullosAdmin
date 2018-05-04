@@ -32,6 +32,21 @@ Transformer une url en image
 
 
 
+Transformer une url en media
+---------------
+
+```php
+'colTransformers' => [
+    'imageOrVideo' => NullosMorphicHelper::getStandardColTransformer("media"),
+    'imageOrVideo' => NullosMorphicHelper::getStandardColTransformer("media", ['width' => 120]),
+],
+```
+
+
+<img src="image/morphic-image.png" alt="Drawing"/>
+
+
+
 Transformer un champ en utilisant une fonction custom
 ---------------
 
