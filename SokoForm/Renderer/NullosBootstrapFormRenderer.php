@@ -529,7 +529,6 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         var jForm = jComponent.closest('form');
                         var jTarget = jForm.find('select[name="<?php echo $listenTo; ?>"]');
 
-
                         var api = nullosApi.inst();
                         jTarget
                             .off('change.nullosReactive')
@@ -546,6 +545,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                      */
                                     jComponent.parent().removeClass('soko-active');
                                     jComponent.empty();
+                                    console.log(r);
                                     for (var k in r) {
                                         var v = r[k];
                                         jComponent.append('<option value="' + k + '">' + v + '</option>');

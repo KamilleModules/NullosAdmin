@@ -113,9 +113,10 @@ class NullosMorphicHelper
             case "image":
                 $width = $options['width'] ?? 80;
                 $title = $options['title'] ?? null;
-                return function ($value, array $row) use ($width, $title) {
+                $alt = $options['alt'] ?? "image";
+                return function ($value, array $row) use ($width, $title, $alt) {
 
-                    $s = '<img src="' . $value . '" alt="image" width="' . $width . '"';
+                    $s = '<img src="' . $value . '" alt="' . htmlspecialchars($alt) . '" width="' . $width . '"';
                     if ($title) {
                         if (is_callable($title)) {
                             $title = call_user_func($title, $row);
