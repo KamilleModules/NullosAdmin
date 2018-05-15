@@ -638,6 +638,14 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                class="js-switch" <?php echo $sChecked; ?>/>
                     </label>
                 </div>
+            <div class="clearfix"></div>
+            <?php
+        $properties = array_key_exists("properties", $model) ? $model['properties'] : [];
+        $infoBox = (array_key_exists('info', $properties)) ? $properties['info'] : [];
+        if ($infoBox) {
+            $this->printInfoBox($infoBox);
+        }
+        ?>
             </div>
         </div>
         <?php
