@@ -12,6 +12,7 @@ Les widgets suivants vous permettront de créer plus rapidement certains éléme
 - [InfoTable](#infotable)
 - [MorphicList](#morphiclist)
 - [MorphicItem](#morphicitem) 
+- [Error](#error) 
 
 
 
@@ -213,6 +214,33 @@ class UserListController extends EkUserListController
         ]);
     }
 }
+
+```
+
+
+
+
+
+Error
+======================
+
+Affiche un message d'erreur
+
+<img src="image/nullos-error-widget.png" alt="Drawing"/>
+
+
+
+```php
+<?php
+
+$this->getClaws()
+    ->setWidget("maincontent.errorMessage", ClawsWidget::create()
+        ->setTemplate("NullosAdmin/Main/Error/default")
+        ->setConf([
+            "title" => "Oops",
+            "message" => "Veuillez renseigner votre ip dans l'url.",
+        ])
+    );
 
 ```
 
