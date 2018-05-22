@@ -55,3 +55,124 @@ class MyTestController extends NullosBaseController
 
 
 ````
+
+
+
+Le contrôleur avec une liste morphic
+----------------------
+
+````php
+<?php
+
+namespace Controller\EkomTrainingProducts\Back\Participant;
+
+
+use Controller\NullosAdmin\Back\NullosMorphicController;
+use Core\Services\A;
+use Kamille\Utils\Claws\ClawsWidget;
+use Module\NullosAdmin\Morphic\Helper\NullosMorphicModelHelper;
+
+class ParticipantFilesListController extends NullosMorphicController
+{
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $pageTop = $this->pageTop();
+        $pageTop->breadcrumbs()->reset()
+            ->addLink("Pièces administratives", A::link("EkomTrainingProducts_ParticipantFiles_List"));
+    }
+
+
+    public function render()
+    {
+
+        $this->prepareClaws();
+        $this->getClaws()
+            ->setWidget("maincontent.participant_files", ClawsWidget::create()
+                ->setTemplate("NullosAdmin/Main/MorphicList/default")
+                ->setConf([
+                    'model' => NullosMorphicModelHelper::getListModel("Ekom", "back/users/user_order"),
+                ])
+            );
+
+
+        return $this->doRenderClaws();
+    }
+}
+
+
+
+
+````
+
+
+
+Le contrôleur d'affichage du détail d'un item de liste
+----------------------
+
+````php
+<?php
+
+
+namespace Controller\PeiPei\Back\Transaction;
+
+use Controller\NullosAdmin\Back\NullosMorphicController;
+use Kamille\Utils\Claws\ClawsWidget;
+
+
+class TransactionInfoController extends NullosMorphicController
+{
+
+    public function render()
+    {
+        $this->prepareClaws();
+
+
+        //--------------------------------------------
+        // CONFIGURE HEADER
+        //--------------------------------------------
+        $pageTop = $this->pageTop();
+        $pageTop->setTitle("Détail d'une transaction");
+        $pageTop->breadcrumbs()->addLink("Transactions");
+
+
+        //--------------------------------------------
+        // PREPARE THE PAGE DEPENDING ON THE ID PASSED IN THE URI
+        //--------------------------------------------
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $table = [
+                "Pays d'origine" => "France",
+                "Inscrit à la newsletter" => false,
+            ];
+            $this->getClaws()
+                ->setWidget("maincontent.appInfo", ClawsWidget::create()
+                    ->setTemplate("NullosAdmin/Main/VeryFlatTable/default")
+                    ->setConf([
+                        'title' => "Détails du compte",
+                        'flatTable' => $table,
+                    ])
+                );
+        } else {
+            $this->getClaws()
+                ->setWidget("maincontent.errorMessage", ClawsWidget::create()
+                    ->setTemplate("NullosAdmin/Main/Error/default")
+                    ->setConf([
+                        "title" => "Oops",
+                        "message" => "Veuillez renseigner l'id dans l'url",
+                    ])
+                );
+        }
+
+
+        return parent::doRenderClaws();
+    }
+}
+
+
+
+
+
+````
