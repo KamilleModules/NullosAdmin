@@ -74,6 +74,15 @@ class NullosMorphicHelper
             case "toolong":
                 return function ($value, array $row) use ($options) {
                     $length = $options['length'] ?? 50;
+                    /**
+                     * Useful if the input comes from the user and might contain anything...
+                     */
+                    $safe = $options['safe'] ?? false;
+                    if (true === $safe) {
+                        $value = strip_tags($value);
+                        $value = htmlspecialchars($value);
+                    }
+
                     $s = substr($value, 0, $length);
                     if (strlen($value) > $length) {
                         $s .= '...';

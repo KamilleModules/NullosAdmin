@@ -176,3 +176,50 @@ class TransactionInfoController extends NullosMorphicController
 
 
 ````
+
+
+
+Le contrôleur FormList morphic qui étend un contrôleur morphic généré
+----------------------
+
+Ce contrôleur est très pratique lorsqu'on créé un système from scratch proche de la structure des tables.
+
+````php
+<?php
+
+
+namespace Controller\TeamMail\Back\Contact;
+
+use Controller\TeamMail\Back\Generated\TmContact\TmContactListController;
+use Core\Services\A;
+use Module\TeamMail\Helper\TeamMailBackControllerHelper;
+
+
+class ContactListController extends TmContactListController
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->addConfigValues([
+            'title' => "Contacts",
+            'route' => "TeamMail_Contact_List",
+            'form' => "back/contact",
+            'list' => "back/contact",
+            'boundTables' => TeamMailBackControllerHelper::getBoundTables(),
+        ]);
+
+    }
+
+
+    public function preparePageTop()
+    {
+        parent::preparePageTop();
+        $this->pageTop()->setTitle("Contacts");
+        $this->pageTop()->breadcrumbs()->reset()
+            ->addLink("Contacts", A::link("TeamMail_Contact_List"));
+    }
+}
+
+
+
+````

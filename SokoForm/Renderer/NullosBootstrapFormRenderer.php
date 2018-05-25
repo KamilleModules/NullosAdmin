@@ -1589,7 +1589,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
 
     $cssId2 = StringTool::getUniqueCssId("textarea-limitcount-");
+    $value = $model['value'];
     ?>
+
 
 
 
@@ -1617,7 +1619,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 name="<?php echo htmlspecialchars($model['name']); ?>"
                 id="<?php echo $cssId; ?>"
                 class="form-control col-md-7 col-xs-12 an-editor-wrapper"
-        ><?php echo $model['value']; ?></textarea>
+        ><?php echo $value; ?></textarea>
 
         <?php if($maxNbChars):
 
