@@ -468,6 +468,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
             $nullableFirstItem = $properties['nullableFirstItem'] ?? null;
             $onChangeRedirectUriFmt = $properties['onChangeRedirectUriFmt'] ?? null;
+            $isMultiple = $properties['multiple'] ?? false;
 
 
             if ($nullableFirstItem) {
@@ -565,12 +566,22 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 </script>
 
 
-            <?php else: ?>
+            <?php else:
+             $controlName = htmlspecialchars($model['name']);
+            if(true===$isMultiple){
+             $controlName .= "[]";
+            }
+
+             ?>
 
                 <div class="form-group">
                     <label class="control-label col-md-3 col-sm-3 col-xs-12"><?php echo $model['label']; ?></label>
                     <div class="col-md-9 col-sm-9 col-xs-12 <?php echo $sErrorClass; ?>">
-                        <select <?php echo $sDisabled; ?> name="<?php echo htmlspecialchars($model['name']); ?>"
+                        <select
+                         <?php if($isMultiple): ?>
+                         multiple
+                         <?php endif; ?>
+                         <?php echo $sDisabled; ?> name="<?php echo $controlName; ?>"
                                                           id="<?php echo $cssId; ?>"
                                                           class="form-control">
                             <?php foreach ($model['choices'] as $value => $label):

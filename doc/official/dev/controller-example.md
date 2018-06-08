@@ -43,8 +43,8 @@ class MyTestController extends NullosBaseController
 {
     public function render(){
         $this->prepareClaws();
-        $this->getClaws()->setWidget("maincontent.mywidget", ClawsWidget::create() // la position est maincontent
-            ->setTemplate("Test/mytemplate") // theme/nullosAdmin/widgets/Test/mytemplate.tpl.php
+        $this->getClaws()->setWidget("maincontent.mywidget", ClawsWidget::create() 
+            ->setTemplate("Dummy/default") // dummy text
             ->setConf([])
         );
 
@@ -101,6 +101,51 @@ class ParticipantFilesListController extends NullosMorphicController
         return $this->doRenderClaws();
     }
 }
+
+
+
+
+````
+
+
+
+
+Le contrôleur de base avec un formulaire morphic
+----------------------
+
+````php
+<?php
+
+
+namespace Controller\Application\Back\Config;
+
+
+
+
+use Controller\NullosAdmin\Back\NullosMorphicController;
+use Core\Services\A;
+
+class ConfigFormController extends NullosMorphicController
+{
+
+
+    public function render(){
+
+        $this->moduleName = "Application";
+
+
+        $this->pageTop()
+            ->setTitle("Configuration")
+            ->breadcrumbs()->reset()
+            ->addLink("Configuration", A::link("Application_Config_Config_Form"));
+
+        return $this->doRenderForm([
+            'context' => [],
+            'form' => "back/config/config",
+        ]);
+    }
+}
+
 
 
 
