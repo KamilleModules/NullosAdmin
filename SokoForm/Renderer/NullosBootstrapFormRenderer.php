@@ -469,6 +469,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
             $nullableFirstItem = $properties['nullableFirstItem'] ?? null;
             $onChangeRedirectUriFmt = $properties['onChangeRedirectUriFmt'] ?? null;
             $isMultiple = $properties['multiple'] ?? false;
+            $size = $properties['size'] ?? null;
 
 
             if ($nullableFirstItem) {
@@ -580,6 +581,9 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         <select
                          <?php if($isMultiple): ?>
                          multiple
+                         <?php if(null !== $size): ?>
+                         size="<?php echo $size; ?>"
+                         <?php endif; ?>
                          <?php endif; ?>
                          <?php echo $sDisabled; ?> name="<?php echo $controlName; ?>"
                                                           id="<?php echo $cssId; ?>"
