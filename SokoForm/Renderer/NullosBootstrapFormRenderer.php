@@ -1049,6 +1049,13 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     }
 
 
+    protected function renderFileStatic(array $model, array $preferences = [])
+    {
+        $preferences['inputType'] = "file";
+        $this->doRenderInputControl($model, $preferences);
+    }
+
+
     protected function renderInputHidden(array $model, array $preferences = [])
     {
         $preferences['inputType'] = "hidden";

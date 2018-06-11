@@ -73,6 +73,9 @@ Textarea
     ->setName("conditions")
     ->setLabel("Conditions")
     ->setType("textarea")
+    ->setProperties([
+        "rows" => 10,
+    ])
 )
 ```
 
