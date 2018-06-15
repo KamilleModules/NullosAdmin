@@ -1582,6 +1582,7 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
     {
 
         $properties = $model['properties'];
+        $infoText = $properties['info']??"";
         $wysiwyg = (array_key_exists('wysiwyg', $properties)) ? $properties['wysiwyg'] : false;
         $showSerializeOnly = $properties['showSerializeOnly'] ?? false;
         $rows = $properties['rows'] ?? null;
@@ -1678,7 +1679,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
         </script>
         <?php endif; ?>
 
-
+        <?php
+        if ($infoText) {
+            $this->printInfoBox($infoText);
+        }
+        ?>
     <?php endif; ?>
 
 
