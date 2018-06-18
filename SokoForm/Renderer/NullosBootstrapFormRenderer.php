@@ -581,7 +581,11 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                         <select
                          <?php if($isMultiple): ?>
                          multiple
-                         <?php if(null !== $size): ?>
+                         <?php if(null !== $size):
+                          if("auto" === $size){
+                             $size=count($model['choices']);
+                          }
+                          ?>
                          size="<?php echo $size; ?>"
                          <?php endif; ?>
                          <?php endif; ?>
@@ -589,7 +593,13 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                                                           id="<?php echo $cssId; ?>"
                                                           class="form-control">
                             <?php foreach ($model['choices'] as $value => $label):
+                            $sSel  = "";
+                            if(is_array($model['value'])){
+                                $sSel = (in_array((string)$value,$model['value'])) ? ' selected="selected"' : '';
+                            }
+                            else{
                                 $sSel = ((string)$value === (string)$model['value']) ? ' selected="selected"' : '';
+                            }
                                 ?>
                                 <option
                                     <?php echo $sSel; ?>

@@ -223,6 +223,19 @@ $choice_product_types = QuickPdo::fetchAll("select id, concat(id, \". \", name) 
 ```
 
 
+###### Liste multiple
+
+```php
+->addControl(SokoChoiceControl::create()
+    ->setProperties([
+         "multiple" => true,
+         "size" => "auto",
+    ])
+    ->setChoices($statusList)
+)
+```
+
+
 ###### Afficher un lien supplémentaire
 
 ```php
