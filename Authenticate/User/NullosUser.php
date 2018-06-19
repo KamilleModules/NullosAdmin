@@ -46,6 +46,17 @@ class NullosUser
         return NullosSession::getUserValue($k, $default);
     }
 
+    public static function getId()
+    {
+        return NullosSession::getUserValue("id");
+    }
+
+
+    public static function all()
+    {
+        return NullosSession::all();
+    }
+
     public static function set($k, $v)
     {
         return NullosSession::setUserValue($k, $v);

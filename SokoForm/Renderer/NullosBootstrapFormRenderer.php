@@ -1310,13 +1310,22 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
 
                     <?php else:
                     $properties = $model['properties'];
+                    $isDisabled = $this->isDisabled($model);
+                    $isReadOnly = $this->isReadOnly($model);
                     $lang = (array_key_exists("lang", $properties)) ? $properties["lang"] : "en";
                     ?>
                     <?php if (array_key_exists("date", $properties) && true === $properties['date']): ?>
 
                     <?php if (array_key_exists("useTime", $properties) && true === $properties['useTime']): ?>
 
-                    <input type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
+                    <input
+                    <?php if(true===$isDisabled): ?>
+                     disabled
+                    <?php endif; ?>
+                    <?php if(true===$isReadOnly): ?>
+                     readonly
+                    <?php endif; ?>
+                     type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
                            class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
                            value="<?php echo htmlspecialchars($model['value']); ?>"
                         <?php if (null !== $model['label']): ?>
@@ -1341,7 +1350,14 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                     <?php else: ?>
 
 
-                    <input type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
+                    <input
+                    <?php if(true===$isDisabled): ?>
+                     disabled
+                    <?php endif; ?>
+                    <?php if(true===$isReadOnly): ?>
+                     readonly
+                    <?php endif; ?>
+                            type="text" name="<?php echo htmlspecialchars($model['name']); ?>"
                            class="form-control has-feedback-left" id="<?php echo $cssId; ?>"
                            value="<?php echo htmlspecialchars($model['value']); ?>"
                         <?php if (null !== $model['label']): ?>
@@ -1562,7 +1578,6 @@ class NullosBootstrapFormRenderer extends SokoFormRenderer
                 <?php endif; ?>
             >
 
-            <!--        <span class="fa fa-calendar-o form-control-feedback left"></span>-->
             <?php if ($leftBoxText || $leftBoxIcon): ?>
                 <span class="<?php echo $leftBoxIcon; ?> form-control-feedback left left-box"><?php echo $leftBoxText; ?></span>
             <?php endif; ?>

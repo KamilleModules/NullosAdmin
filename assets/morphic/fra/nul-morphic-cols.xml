@@ -1,0 +1,71 @@
+<?xml version='1.0' standalone='yes'?>
+<cols>
+    <item>
+        <name>active</name>
+        <value>actif</value>
+    </item>
+    <item>
+        <name>avatar</name>
+        <value>avatar</value>
+    </item>
+    <item>
+        <name>badge_id</name>
+        <value>id badge</value>
+    </item>
+    <item>
+        <name>date_added</name>
+        <value>date d'ajout</value>
+    </item>
+    <item>
+        <name>date_created</name>
+        <value>date de création</value>
+    </item>
+    <item>
+        <name>date_last_connexion</name>
+        <value>date de la dernière connexion</value>
+    </item>
+    <item>
+        <name>email</name>
+        <value>email</value>
+    </item>
+    <item>
+        <name>id</name>
+        <value>id</value>
+    </item>
+    <item>
+        <name>is_read</name>
+        <value>est lu</value>
+    </item>
+    <item>
+        <name>label</name>
+        <value>label</value>
+    </item>
+    <item>
+        <name>message</name>
+        <value>message</value>
+    </item>
+    <item>
+        <name>name</name>
+        <value>nom</value>
+    </item>
+    <item>
+        <name>origin</name>
+        <value>origine</value>
+    </item>
+    <item>
+        <name>pass</name>
+        <value>mot de passe</value>
+    </item>
+    <item>
+        <name>pseudo</name>
+        <value>pseudo</value>
+    </item>
+    <item>
+        <name>user_group_id</name>
+        <value>id groupe</value>
+    </item>
+    <item>
+        <name>user_id</name>
+        <value>id utilisateur</value>
+    </item>
+</cols>

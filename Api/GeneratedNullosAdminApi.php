@@ -4,7 +4,9 @@
 namespace Module\NullosAdmin\Api;
 
 use Module\NullosAdmin\Api\Object\Badge;
+use Module\NullosAdmin\Api\Object\Message;
 use Module\NullosAdmin\Api\Object\User;
+use Module\NullosAdmin\Api\Object\UserGroup;
 use Module\NullosAdmin\Api\Object\UserHasBadge;
 
 use XiaoApi\Api\XiaoApi;
@@ -42,11 +44,25 @@ class GeneratedNullosAdminApi extends XiaoApi
         return $this->getObject('badge');
     }
     /**
+     * @return Message
+     */
+    public function message()
+    {
+        return $this->getObject('message');
+    }
+    /**
      * @return User
      */
     public function user()
     {
         return $this->getObject('user');
+    }
+    /**
+     * @return UserGroup
+     */
+    public function userGroup()
+    {
+        return $this->getObject('userGroup');
     }
     /**
      * @return UserHasBadge

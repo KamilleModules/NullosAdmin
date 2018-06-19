@@ -28,6 +28,7 @@ class NullosUserHelper
              * Connect the user
              */
             $user = [
+                "id" => $userInfo['id'],
                 "login" => $userInfo['id'],
                 "email" => $email,
                 "avatar" => $userInfo['avatar'],

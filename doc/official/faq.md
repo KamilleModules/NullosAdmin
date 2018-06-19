@@ -50,3 +50,13 @@ nullosApi.inst().confirm(confirmText, function () {
     alert("ok");
 }, confirmTitle, confirmButtonOkText, confirmButtonCancelText);
 ```
+
+
+
+Récupérer des informations sur l'utilisateur connecté
+----------------------------------- 
+
+```php
+// récupérer l'id de l'utilisateur
+a(NullosUser::getId()); // 4
+```

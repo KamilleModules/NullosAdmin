@@ -13,13 +13,13 @@ use XiaoApi\Object\TableCrudObject;
  *
  * You are supposed to extend this object.
  */
-class GeneratedUser extends TableCrudObject
+class GeneratedUserGroup extends TableCrudObject
 {
 
     public function __construct()
     {
         parent::__construct();
-        $this->table = "nul_user";
+        $this->table = "nul_user_group";
         $this->primaryKey = ['id'];
     }
 
@@ -31,20 +31,11 @@ class GeneratedUser extends TableCrudObject
     {
         $base = [
 			'id' => null,
-			'email' => '',
-			'pass' => '',
-			'avatar' => '',
-			'pseudo' => '',
-			'active' => 0,
-			'date_created' => '',
-			'date_last_connexion' => null,
-			'user_group_id' => 0,
+			'name' => '',
+			'label' => '',
 		];
         $ret = array_replace($base, array_intersect_key($data, $base));
 
-        if ("" === $ret["date_last_connexion"]) {
-            $ret["date_last_connexion"] = null;
-        }
 
 
         return $ret;

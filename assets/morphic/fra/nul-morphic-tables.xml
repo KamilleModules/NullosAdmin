@@ -1,0 +1,33 @@
+<?xml version='1.0' standalone='yes'?>
+<infos>
+    <item table="nul_badge">
+        <label>badge</label>
+        <labelPlural>badges</labelPlural>
+        <genre>m</genre>
+        <article>le</article>
+    </item>
+    <item table="nul_message">
+        <label>message</label>
+        <labelPlural>messages</labelPlural>
+        <genre>m</genre>
+        <article>le</article>
+    </item>
+    <item table="nul_user">
+        <label>utilisateur</label>
+        <labelPlural>utilisateurs</labelPlural>
+        <genre>m</genre>
+        <article>l'</article>
+    </item>
+    <item table="nul_user_group">
+        <label>groupe</label>
+        <labelPlural>groupes</labelPlural>
+        <genre>m</genre>
+        <article>le</article>
+    </item>
+    <item table="nul_user_has_badge">
+        <label>liaison utilisateur/badge</label>
+        <labelPlural>liaisons utilisateur/badge</labelPlural>
+        <genre>f</genre>
+        <article>la</article>
+    </item>
+</infos>

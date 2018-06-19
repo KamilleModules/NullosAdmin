@@ -9,6 +9,20 @@ use QuickPdo\QuickPdo;
 class NullosAdminUserLayer
 {
 
+
+    public static function getUserIdsByGroup(string $groupName)
+    {
+        return QuickPdo::fetchAll("
+select u.id 
+from nul_user u 
+inner join nul_user_group g on g.id=u.user_group_id
+where g.name=:name
+", [
+            "name" => $groupName,
+        ], \PDO::FETCH_COLUMN);
+    }
+
+
     /**
      *
      * @param $email
