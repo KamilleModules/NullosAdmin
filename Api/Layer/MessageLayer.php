@@ -40,10 +40,23 @@ and is_read=0
     }
 
 
-    public static function addMessageByGroupName(string $groupName, string $message, string $origin = null)
+    /**
+     * We recommend that origin is the name of the Module.
+     * This allows us later to have more flexibility for filtering messages that one wants to receive.
+     *
+     * As for the badge naming, I'm not sure what to do, I'll experiment the following:
+     *
+     *
+     *
+     * - $Module.alert.$messageIdentifier:
+     *              ex: Formaway.alert.new_training,
+     *                  This class of messages
+     *
+     *
+     */
+    public static function addMessageByBadge(string $badgeName, string $message, string $origin = null)
     {
-        $userIds = NullosAdminUserLayer::getUserIdsByGroup($groupName);
-
+        $userIds = NullosAdminUserLayer::getUserIdsByBadge($badgeName);
         foreach ($userIds as $userId) {
             Message::getInst()->create([
                 "user_id" => $userId,
@@ -59,16 +72,15 @@ and is_read=0
     public static function getLastMessages(int $userId = null, array $options = [])
     {
 
+        $nbMessages = $options['nbMessages'] ?? 5;
+
+
         if (null === $userId) {
             $userId = NullosUser::getId();
             if (null === $userId) {
                 return [];
             }
         }
-
-
-        $nbMessages = $options['nbMessages'] ?? 5;
-
 
         return QuickPdo::fetchAll("
 select

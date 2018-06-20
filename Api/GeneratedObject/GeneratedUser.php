@@ -38,7 +38,6 @@ class GeneratedUser extends TableCrudObject
 			'active' => 0,
 			'date_created' => '',
 			'date_last_connexion' => null,
-			'user_group_id' => 0,
 		];
         $ret = array_replace($base, array_intersect_key($data, $base));
 

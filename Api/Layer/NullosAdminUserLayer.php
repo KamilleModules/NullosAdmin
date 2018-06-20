@@ -10,15 +10,16 @@ class NullosAdminUserLayer
 {
 
 
-    public static function getUserIdsByGroup(string $groupName)
+    public static function getUserIdsByBadge(string $badge)
     {
         return QuickPdo::fetchAll("
 select u.id 
 from nul_user u 
-inner join nul_user_group g on g.id=u.user_group_id
-where g.name=:name
+inner join nul_user_has_badge h on h.user_id=u.id
+inner join nul_badge b on b.id=h.badge_id
+where b.name=:name
 ", [
-            "name" => $groupName,
+            "name" => $badge,
         ], \PDO::FETCH_COLUMN);
     }
 
