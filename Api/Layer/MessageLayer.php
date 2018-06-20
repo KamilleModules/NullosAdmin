@@ -24,6 +24,9 @@ class MessageLayer
     {
         if (null === $userId) {
             $userId = NullosUser::getId();
+            if (null === $userId) {
+                return 0;
+            }
         }
 
 
@@ -56,12 +59,16 @@ and is_read=0
     public static function getLastMessages(int $userId = null, array $options = [])
     {
 
-        $nbMessages = $options['nbMessages'] ?? 5;
-
-
         if (null === $userId) {
             $userId = NullosUser::getId();
+            if (null === $userId) {
+                return [];
+            }
         }
+
+
+        $nbMessages = $options['nbMessages'] ?? 5;
+
 
         return QuickPdo::fetchAll("
 select
