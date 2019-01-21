@@ -19,7 +19,7 @@ NullosAdmin est un outil pour développeurs qui fournit un cadre de base dans le
 Le cadre de base est l'interface graphique suivante:
 
  
-[![nullos-admin-default-layout.jpg](https://s19.postimg.org/898eyh6ib/nullos-admin-default-layout.jpg)](https://postimg.org/image/hh0nf6dkf/)
+[![nullos-admin-default-layout.jpg](http://lingtalfi.com/img/kamille-modules/NullosAdmin/nullos-admin-default-layout.jpg)](http://lingtalfi.com/img/kamille-modules/NullosAdmin/nullos-admin-default-layout.jpg)
 
 
 L'interface graphique (aussi appelée gui) est composée des **zones** suivantes:

@@ -20,7 +20,7 @@ default layout.
 
 
 
-[![nullos-admin-default-layout.jpg](https://s19.postimg.org/898eyh6ib/nullos-admin-default-layout.jpg)](https://postimg.org/image/hh0nf6dkf/)
+[![nullos-admin-default-layout.jpg](http://lingtalfi.com/img/kamille-modules/NullosAdmin/nullos-admin-default-layout.jpg)](http://lingtalfi.com/img/kamille-modules/NullosAdmin/nullos-admin-default-layout.jpg)
 
 
 As we can see, there is a left pane and a right pane.
